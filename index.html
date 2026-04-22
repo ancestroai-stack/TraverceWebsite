@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Traverce — The New Sound Frontier. Discover the artists shaping global underground culture. Music discovery, editorial deep dives, and visual stories." />
+  <meta name="keywords" content="music discovery, underground music, editorial, culture, Traverce, artists, albums, shop" />
+  <meta property="og:title" content="Traverce — The New Sound Frontier" />
+  <meta property="og:description" content="Discover the artists shaping global underground culture." />
+  <meta property="og:type" content="website" />
+  <title>Traverce — The New Sound Frontier</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       SEARCH OVERLAY
+  ════════════════════════════════════════════════ -->
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="Search">
+    <div class="search-inner">
+      <p class="search-label">Search Traverce</p>
+      <div class="search-field">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Artist, Album, Feature…" autocomplete="off" />
+      </div>
+    </div>
+    <button class="search-close" id="searchClose" aria-label="Close search">ESC / Close</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       NAVIGATION
+  ════════════════════════════════════════════════ -->
+  <header class="nav" id="mainNav" role="banner">
+    <a href="#home" class="nav-logo" data-tab="home" aria-label="Traverce Home">Traverce</a>
+
+    <div class="nav-right">
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="#home"    class="nav-tab active" data-tab="home"    id="tab-home">Home</a>
+        <a href="#artist"  class="nav-tab"         data-tab="artist"  id="tab-artist">Artist Profile</a>
+        <a href="#hub"     class="nav-tab"         data-tab="hub"     id="tab-hub">Content Hub</a>
+        <a href="#shop"    class="nav-tab"         data-tab="shop"    id="tab-shop">Shop</a>
+        <a href="#about"   class="nav-tab"         data-tab="about"   id="tab-about">About</a>
+      </nav>
+
+      <button class="nav-search" id="searchBtn" aria-label="Open search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+
+      <!-- Cart Icon -->
+      <button class="nav-cart" id="cartBtn" aria-label="Shopping cart">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle mobile navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       PAGE: HOME
+  ════════════════════════════════════════════════ -->
+  <div class="page-view active" id="page-home">
+    <main>
+
+      <!-- HERO -->
+      <section class="hero" id="hero" aria-label="Hero">
+        <div class="hero-bg">
+          <img src="images/hero.png" alt="Underground artist — Traverce editorial photography" loading="eager" />
+        </div>
+        <div class="hero-content container">
+          <div class="hero-eyebrow">
+            <div class="hero-eyebrow-line"></div>
+            <span class="hero-eyebrow-text">Music &amp; Culture Media</span>
+          </div>
+          <h1 class="hero-title">
+            Traverce:<br>
+            The new<br>
+            Sound <em>Frontier</em>
+          </h1>
+          <p class="hero-subtitle">Discover the artists shaping global underground culture</p>
+          <div class="hero-ctas">
+            <a href="#" class="btn-primary" id="hero-explore-btn" data-tab="artist">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 6h10M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Explore Artists
+            </a>
+            <a href="#" class="btn-ghost" id="hero-read-btn" data-tab="hub">Read Features</a>
+          </div>
+        </div>
+        <div class="hero-scroll" aria-hidden="true">
+          <div class="hero-scroll-line"></div>
+          <span class="hero-scroll-label">Scroll</span>
+        </div>
+      </section>
+
+      <!-- Ticker Bar -->
+      <div class="ticker-bar" aria-hidden="true">
+        <div class="ticker-track" id="tickerTrack">
+          <span>Fresh Sonics</span><span class="ticker-dot">◆</span>
+          <span>Editorial Deep Dives</span><span class="ticker-dot">◆</span>
+          <span>Visual Stories</span><span class="ticker-dot">◆</span>
+          <span>Underground Culture</span><span class="ticker-dot">◆</span>
+          <span>Traverce Radio</span><span class="ticker-dot">◆</span>
+          <span>Artist Spotlights</span><span class="ticker-dot">◆</span>
+          <span>New Releases</span><span class="ticker-dot">◆</span>
+          <span>Exclusive Sessions</span><span class="ticker-dot">◆</span>
+          <span>Fresh Sonics</span><span class="ticker-dot">◆</span>
+          <span>Editorial Deep Dives</span><span class="ticker-dot">◆</span>
+          <span>Visual Stories</span><span class="ticker-dot">◆</span>
+          <span>Underground Culture</span><span class="ticker-dot">◆</span>
+          <span>Traverce Radio</span><span class="ticker-dot">◆</span>
+          <span>Artist Spotlights</span><span class="ticker-dot">◆</span>
+          <span>New Releases</span><span class="ticker-dot">◆</span>
+          <span>Exclusive Sessions</span><span class="ticker-dot">◆</span>
+        </div>
+      </div>
+
+      <!-- TRENDING NOW + GLOBAL CHARTS -->
+      <section class="trending" id="trending" aria-labelledby="trending-title">
+
+        <!-- ▸ Block 1: Trending Now (card strip) -->
+        <div class="tn-block">
+          <div class="container">
+            <div class="tn-header fade-up">
+              <div class="tn-header-left">
+                <div class="tn-eyebrow">Curated Selection</div>
+                <h2 class="tn-title" id="trending-title">Trending Now</h2>
+              </div>
+              <a href="#" class="tn-view-all">View All Charts ›</a>
+            </div>
+
+            <div class="tn-cards fade-up">
+
+              <article class="tn-card" id="tn-card-1">
+                <div class="tn-card-img">
+                  <img src="images/editorial2.png" alt="Midnight Sessions — Eera" loading="lazy"/>
+                  <span class="tn-badge hot">Hot</span>
+                </div>
+                <div class="tn-card-info">
+                  <div class="tn-card-name">Midnight Sessions</div>
+                  <div class="tn-card-sub">Eera · Underground Afrobeats</div>
+                </div>
+              </article>
+
+              <article class="tn-card" id="tn-card-2">
+                <div class="tn-card-img">
+                  <img src="images/artist2.png" alt="Urban Echoes — Kaygrö" loading="lazy"/>
+                  <span class="tn-badge trending">Trending</span>
+                </div>
+                <div class="tn-card-info">
+                  <div class="tn-card-name">Urban Echoes</div>
+                  <div class="tn-card-sub">Kaygrö · Grime · Fusion</div>
+                </div>
+              </article>
+
+              <article class="tn-card" id="tn-card-3">
+                <div class="tn-card-img">
+                  <img src="images/artist3.png" alt="Sonic Landscapes — Amara K" loading="lazy"/>
+                  <span class="tn-badge hot">Hot</span>
+                </div>
+                <div class="tn-card-info">
+                  <div class="tn-card-name">Sonic Landscapes</div>
+                  <div class="tn-card-sub">Afrobeats / Neo-Soul · Alt</div>
+                </div>
+              </article>
+
+              <article class="tn-card" id="tn-card-4">
+                <div class="tn-card-img">
+                  <img src="images/artist4.png" alt="Vocal Essence — Neuríc" loading="lazy"/>
+                </div>
+                <div class="tn-card-info">
+                  <div class="tn-card-name">Vocal Essence</div>
+                  <div class="tn-card-sub">Neuríc · Electronic</div>
+                </div>
+              </article>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ▸ Block 2: Global Charts (split layout) -->
+        <div class="gc-block">
+          <div class="container gc-inner">
+
+            <!-- Left: title + description -->
+            <div class="gc-left fade-up">
+              <h2 class="gc-title">Global<br>Charts</h2>
+              <p class="gc-desc">The definitive ranking of influence and artistry. Updated every 24 hours.</p>
+              <button class="gc-share-btn" id="gcShareBtn">Share Chart</button>
+            </div>
+
+            <!-- Right: chart rows -->
+            <div class="gc-rows">
+              <div class="loading-state fade-up" style="color: var(--muted); font-family: var(--font-ui); font-size: 0.9rem; padding: 2rem 0;">
+                Fetching live charts from Spotify...
+              </div>
+            </div><!-- /.gc-rows -->
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- FRESH SONICS -->
+      <section class="fresh-sonics" id="fresh-sonics" aria-labelledby="fresh-sonics-title">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2 class="section-title" id="fresh-sonics-title">Fresh <span>Sonics</span></h2>
+            <a href="#" class="view-all" id="fresh-sonics-view-all">View All</a>
+          </div>
+          <div class="sonics-grid">
+            <article class="sonics-card featured fade-up" id="sonics-card-featured">
+              <div class="sonics-card-img">
+                <img src="images/editorial2.png" alt="Featured artist — Eera, Underground Afrobeats" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">New Release</div>
+                <div class="sonics-card-name">Eera — Hollow Frequencies</div>
+                <div class="sonics-card-sub">Album · Underground Afrobeats</div>
+              </div>
+            </article>
+            <article class="sonics-card fade-up" id="sonics-card-1">
+              <div class="sonics-card-img">
+                <img src="images/album1.png" alt="Album: Dark Stasis by ANTAUSER" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">Album</div>
+                <div class="sonics-card-name">ANTAUSER</div>
+                <div class="sonics-card-sub">Dark Stasis — Electronic</div>
+              </div>
+            </article>
+            <article class="sonics-card fade-up" id="sonics-card-2">
+              <div class="sonics-card-img">
+                <img src="images/artist1.png" alt="Artist: Nóben" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">Artist</div>
+                <div class="sonics-card-name">NÓBEN</div>
+                <div class="sonics-card-sub">Emerging · Alt-Soul</div>
+              </div>
+            </article>
+            <article class="sonics-card fade-up" id="sonics-card-3">
+              <div class="sonics-card-img">
+                <img src="images/artist2.png" alt="Artist: Kaygrö" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">Single</div>
+                <div class="sonics-card-name">KAYGRÖ</div>
+                <div class="sonics-card-sub">Groundbreaker — Grime</div>
+              </div>
+            </article>
+            <article class="sonics-card fade-up" id="sonics-card-4">
+              <div class="sonics-card-img">
+                <img src="images/album2.png" alt="Album: Pulse Lines" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">Album</div>
+                <div class="sonics-card-name">SOLÈNE</div>
+                <div class="sonics-card-sub">Pulse Lines — Neo-Soul</div>
+              </div>
+            </article>
+            <article class="sonics-card fade-up" id="sonics-card-5">
+              <div class="sonics-card-img">
+                <img src="images/artist3.png" alt="Artist: Amara K" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">Artist</div>
+                <div class="sonics-card-name">AMARA K</div>
+                <div class="sonics-card-sub">Breaking · Afropop</div>
+              </div>
+            </article>
+            <article class="sonics-card fade-up" id="sonics-card-6">
+              <div class="sonics-card-img">
+                <img src="images/artist4.png" alt="Artist: Neuríc" loading="lazy" />
+                <div class="sonics-card-play"><div class="play-icon"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+              </div>
+              <div class="sonics-card-info">
+                <div class="sonics-card-tag">Producer</div>
+                <div class="sonics-card-name">NEURÍC</div>
+                <div class="sonics-card-sub">Album · Experimental</div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- EDITORIAL DEEP DIVES -->
+      <section class="editorial" id="editorial" aria-labelledby="editorial-title">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2 class="section-title" id="editorial-title">Editorial <span>Deep Dives</span></h2>
+            <a href="#" class="view-all" id="editorial-view-all">View All</a>
+          </div>
+          <div class="editorial-grid">
+            <article class="editorial-feature fade-up" id="editorial-main" tabindex="0">
+              <img src="images/editorial1.png" alt="Emerging the Sounds — A deep dive into pentume's sonic language" loading="lazy" />
+              <div class="editorial-feature-content">
+                <span class="editorial-feature-cat">Deep Dive</span>
+                <h3 class="editorial-feature-title">Emerging the Sounds:<br>Rebooting Pentume's Universe</h3>
+                <div class="editorial-feature-meta">
+                  <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 8 min read</span>
+                  <span>By Dayo Alari</span>
+                  <span>April 2026</span>
+                </div>
+              </div>
+            </article>
+            <div class="editorial-stack">
+              <article class="editorial-card fade-up" id="editorial-card-1" tabindex="0">
+                <div class="editorial-card-img"><img src="images/artist1.png" alt="Love Rano Mek editorial feature" loading="lazy" /></div>
+                <div class="editorial-card-body">
+                  <div class="editorial-card-cat">Interview</div>
+                  <h3 class="editorial-card-title">Love Rano Mek: The Artist Who Refused to Be Filed</h3>
+                  <p class="editorial-card-excerpt">A conversation with one of the most elusive voices in contemporary alt-soul. She speaks in frequencies, not words.</p>
+                  <div class="editorial-card-meta">6 min · By Kemi Ola</div>
+                </div>
+              </article>
+              <article class="editorial-card fade-up" id="editorial-card-2" tabindex="0">
+                <div class="editorial-card-img"><img src="images/artist2.png" alt="Grime Renaissance editorial feature" loading="lazy" /></div>
+                <div class="editorial-card-body">
+                  <div class="editorial-card-cat">Culture</div>
+                  <h3 class="editorial-card-title">The Grime Renaissance Nobody is Talking About</h3>
+                  <p class="editorial-card-excerpt">How a new wave of artists is reclaiming the streets — one bar at a time. This is not a revival, it's an evolution.</p>
+                  <div class="editorial-card-meta">10 min · By Marcus Webb</div>
+                </div>
+              </article>
+              <article class="editorial-card fade-up" id="editorial-card-3" tabindex="0">
+                <div class="editorial-card-img"><img src="images/artist3.png" alt="Afropop and the diaspora editorial feature" loading="lazy" /></div>
+                <div class="editorial-card-body">
+                  <div class="editorial-card-cat">Feature</div>
+                  <h3 class="editorial-card-title">Afropop &amp; The Diaspora: New Codes, New Language</h3>
+                  <p class="editorial-card-excerpt">Inside the cross-continental movement reshaping popular music from Lagos to London and beyond.</p>
+                  <div class="editorial-card-meta">7 min · By Adaeze Nwosu</div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISUAL STORIES -->
+      <section class="visual-stories" id="visual-stories" aria-labelledby="visual-stories-title">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2 class="section-title" id="visual-stories-title">Visual <span>Stories</span></h2>
+            <a href="#" class="view-all" id="visual-stories-view-all">View All</a>
+          </div>
+          <div class="stories-grid">
+            <article class="story-card fade-up" id="story-card-1">
+              <div class="story-card-thumb">
+                <img src="images/story1.png" alt="Video premiere: Session with Eera and Kaygrö" loading="lazy" />
+                <div class="story-play" aria-label="Play video"><div class="story-play-btn"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+                <span class="story-duration">18:42</span>
+              </div>
+              <div class="story-card-tag">Video Premiere</div>
+              <h3 class="story-card-title">Eera × Kaygrö — Studio Session</h3>
+              <div class="story-card-meta">Visual Story · April 2026</div>
+            </article>
+            <article class="story-card fade-up" id="story-card-2">
+              <div class="story-card-thumb">
+                <img src="images/story2.png" alt="Behind the boards — producer documentary" loading="lazy" />
+                <div class="story-play" aria-label="Play video"><div class="story-play-btn"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+                <span class="story-duration">24:07</span>
+              </div>
+              <div class="story-card-tag">Documentary</div>
+              <h3 class="story-card-title">Behind The Boards: Neuríc's Process</h3>
+              <div class="story-card-meta">Documentary · March 2026</div>
+            </article>
+            <article class="story-card fade-up" id="story-card-3">
+              <div class="story-card-thumb">
+                <img src="images/editorial2.png" alt="Exclusive artist interview with Nóben" loading="lazy" />
+                <div class="story-play" aria-label="Play video"><div class="story-play-btn"><svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg></div></div>
+                <span class="story-duration">12:55</span>
+              </div>
+              <div class="story-card-tag">Exclusive Interview</div>
+              <h3 class="story-card-title">Nóben on Finding Sound in Silence</h3>
+              <div class="story-card-meta">Interview · February 2026</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page Home ends here, transitioning to separate views -->
+    </main>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       PAGE: ARTIST PROFILE
+  ════════════════════════════════════════════════ -->
+  <div class="page-view" id="page-artist">
+
+    <!-- Artist Hero -->
+    <section class="artist-hero" aria-label="Artist Hero">
+      <div class="artist-hero-bg">
+        <img src="images/editorial1.png" alt="Eera — Artist Portrait" loading="eager" />
+      </div>
+      <div class="artist-hero-overlay"></div>
+      <div class="artist-hero-content container">
+        <div class="artist-breadcrumb">
+          <span>Artist Profile</span>
+          <span class="breadcrumb-sep">›</span>
+          <span>Eera</span>
+        </div>
+        <div class="artist-meta-tags">
+          <span class="artist-genre-tag">Underground Afrobeats</span>
+          <span class="artist-genre-tag">Electronic</span>
+          <span class="artist-genre-tag">Lagos · London</span>
+        </div>
+        <h1 class="artist-name">Eera</h1>
+        <p class="artist-alias">aka "The Frequency Architect"</p>
+        <div class="artist-stats">
+          <div class="artist-stat">
+            <span class="stat-num">2.4M</span>
+            <span class="stat-label">Monthly Listeners</span>
+          </div>
+          <div class="artist-stat">
+            <span class="stat-num">12</span>
+            <span class="stat-label">Releases</span>
+          </div>
+          <div class="artist-stat">
+            <span class="stat-num">47</span>
+            <span class="stat-label">Features</span>
+          </div>
+          <div class="artist-stat">
+            <span class="stat-num">2019</span>
+            <span class="stat-label">Since</span>
+          </div>
+        </div>
+        <div class="artist-hero-ctas">
+          <button class="btn-primary" id="artist-follow-btn">+ Follow</button>
+          <button class="btn-ghost" id="artist-play-all-btn">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 1l9 5-9 5V1z" fill="currentColor"/></svg>
+            Play All
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <main class="artist-main container">
+
+      <!-- Bio + Featured Track -->
+      <div class="artist-body-grid">
+        <div class="artist-bio-col">
+          <div class="artist-section-label">About</div>
+          <p class="artist-bio">
+            Eera blurs the line between sonic architecture and raw emotion. Born in Lagos, raised on the frequencies of London's underground, her music is a collision of Afrobeats tradition and avant-garde electronic experimentation.
+          </p>
+          <p class="artist-bio">
+            Her debut album "Hollow Frequencies" (2026) shattered niche boundaries, clocking 2.4 million streams in its first month and earning praise from global tastemakers as one of the most important debuts of the decade. Eera doesn't just make music — she builds worlds.
+          </p>
+          <div class="artist-social-row">
+            <a href="#" class="social-btn">Ig</a>
+            <a href="#" class="social-btn">X</a>
+            <a href="#" class="social-btn">Sp</a>
+            <a href="#" class="social-btn">Sc</a>
+          </div>
+        </div>
+
+        <!-- Featured Track Player -->
+        <div class="artist-player-col">
+          <div class="artist-player">
+            <div class="player-track-info">
+              <div class="player-track-img">
+                <img src="images/editorial2.png" alt="Hollow Frequencies" loading="lazy"/>
+              </div>
+              <div>
+                <div class="player-track-name">Hollow Frequencies</div>
+                <div class="player-track-sub">Eera · 2026 · 4:38</div>
+              </div>
+            </div>
+            <div class="player-waveform" id="playerWaveform" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="player-controls">
+              <button class="player-btn" id="playerPrev" aria-label="Previous">⏮</button>
+              <button class="player-play-btn" id="playerPlay" aria-label="Play">
+                <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg>
+              </button>
+              <button class="player-btn" id="playerNext" aria-label="Next">⏭</button>
+            </div>
+            <div class="player-progress">
+              <div class="player-progress-bar">
+                <div class="player-progress-fill" id="playerFill" style="width: 35%"></div>
+              </div>
+              <div class="player-time"><span>1:37</span><span>4:38</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Latest Releases -->
+      <div class="artist-releases">
+        <div class="section-header fade-up">
+          <h2 class="section-title">Latest <span>Releases</span></h2>
+          <a href="#" class="view-all">Discography</a>
+        </div>
+        <div class="releases-grid">
+          <article class="release-card fade-up" id="release-1">
+            <div class="release-img"><img src="images/editorial2.png" alt="Hollow Frequencies" loading="lazy"/></div>
+            <div class="release-tag">Album · 2026</div>
+            <div class="release-name">Hollow Frequencies</div>
+            <div class="release-tracks">11 tracks · 47 min</div>
+          </article>
+          <article class="release-card fade-up" id="release-2">
+            <div class="release-img"><img src="images/artist4.png" alt="Drift EP" loading="lazy"/></div>
+            <div class="release-tag">EP · 2025</div>
+            <div class="release-name">Drift</div>
+            <div class="release-tracks">5 tracks · 22 min</div>
+          </article>
+          <article class="release-card fade-up" id="release-3">
+            <div class="release-img"><img src="images/album1.png" alt="Static Hymns single" loading="lazy"/></div>
+            <div class="release-tag">Single · 2025</div>
+            <div class="release-name">Static Hymns</div>
+            <div class="release-tracks">1 track · 3:52</div>
+          </article>
+          <article class="release-card fade-up" id="release-4">
+            <div class="release-img"><img src="images/story1.png" alt="Origins EP" loading="lazy"/></div>
+            <div class="release-tag">EP · 2024</div>
+            <div class="release-name">Origins</div>
+            <div class="release-tracks">6 tracks · 28 min</div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Interactive Lyrics Section -->
+      <div class="artist-lyrics fade-up" id="lyricsSection">
+        <div class="lyrics-header">
+          <h2 class="section-title">Featured <span>Lyrics</span></h2>
+          <button class="lyrics-toggle btn-ghost" id="lyricsToggle">Show Lyrics</button>
+        </div>
+        <div class="lyrics-body" id="lyricsBody">
+          <div class="lyrics-track-label">Hollow Frequencies — Verse 1</div>
+          <div class="lyrics-text">
+            <p>I built a room from borrowed frequencies,<br>
+            Walls of static, doors of broken keys,<br>
+            Every note a ghost that never leaves,<br>
+            I call it home — this sound that breathes.</p>
+
+            <p>Deep in the hollow where the signal bends,<br>
+            Where underground and sky of gold descends,<br>
+            My voice is wire, my pulse is bass,<br>
+            I fold the worlds that others can't embrace.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Artists -->
+      <div class="related-artists fade-up">
+        <div class="section-header">
+          <h2 class="section-title">Related <span>Artists</span></h2>
+        </div>
+        <div class="related-grid">
+          <div class="related-card" id="related-1">
+            <div class="related-img"><img src="images/artist1.png" alt="Nóben" loading="lazy"/></div>
+            <div class="related-name">Nóben</div>
+            <div class="related-genre">Alt-Soul</div>
+          </div>
+          <div class="related-card" id="related-2">
+            <div class="related-img"><img src="images/artist2.png" alt="Kaygrö" loading="lazy"/></div>
+            <div class="related-name">Kaygrö</div>
+            <div class="related-genre">Grime</div>
+          </div>
+          <div class="related-card" id="related-3">
+            <div class="related-img"><img src="images/artist3.png" alt="Amara K" loading="lazy"/></div>
+            <div class="related-name">Amara K</div>
+            <div class="related-genre">Afropop</div>
+          </div>
+          <div class="related-card" id="related-4">
+            <div class="related-img"><img src="images/artist4.png" alt="Neuríc" loading="lazy"/></div>
+            <div class="related-name">Neuríc</div>
+            <div class="related-genre">Experimental</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PAGE: CONTENT HUB
+  ════════════════════════════════════════════════ -->
+  <div class="page-view" id="page-hub">
+
+    <!-- Hub Hero -->
+    <section class="hub-hero" aria-label="Content Hub Hero">
+      <div class="hub-hero-bg">
+        <img src="images/editorial1.png" alt="Content Hub — Featured Story" loading="eager" />
+      </div>
+      <div class="hub-hero-overlay"></div>
+      <div class="hub-hero-content container">
+        <span class="hub-hero-tag">Editor's Pick</span>
+        <h1 class="hub-hero-title">Emerging the Sounds:<br><em>Rebooting Pentume's Universe</em></h1>
+        <div class="hub-hero-meta">
+          <span>By Dayo Alari</span>
+          <span>·</span>
+          <span>8 min read</span>
+          <span>·</span>
+          <span>April 2026</span>
+        </div>
+        <a href="#" class="btn-primary" id="hub-read-btn">Read Full Story</a>
+      </div>
+    </section>
+
+    <main class="hub-main container">
+
+      <!-- Category Filter -->
+      <div class="hub-filters fade-up" role="tablist" aria-label="Article categories">
+        <button class="hub-filter active" data-filter="all" role="tab" id="filter-all">All</button>
+        <button class="hub-filter" data-filter="interviews" role="tab" id="filter-interviews">Interviews</button>
+        <button class="hub-filter" data-filter="culture" role="tab" id="filter-culture">Culture</button>
+        <button class="hub-filter" data-filter="features" role="tab" id="filter-features">Features</button>
+        <button class="hub-filter" data-filter="reviews" role="tab" id="filter-reviews">Reviews</button>
+      </div>
+
+      <div class="hub-body">
+        <!-- Article Grid -->
+        <div class="hub-grid">
+          <article class="hub-card fade-up" data-category="interviews" id="hub-card-1">
+            <div class="hub-card-img"><img src="images/artist1.png" alt="Love Rano Mek" loading="lazy"/></div>
+            <div class="hub-card-body">
+              <span class="hub-card-cat interviews">Interview</span>
+              <h3 class="hub-card-title">Love Rano Mek: The Artist Who Refused to Be Filed</h3>
+              <p class="hub-card-excerpt">A conversation with one of the most elusive voices in contemporary alt-soul. She speaks in frequencies, not words.</p>
+              <div class="hub-card-footer">
+                <span class="hub-card-meta">By Kemi Ola · 6 min</span>
+                <span class="hub-card-reads">4.2K reads</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="hub-card fade-up" data-category="culture" id="hub-card-2">
+            <div class="hub-card-img"><img src="images/artist2.png" alt="Grime Renaissance" loading="lazy"/></div>
+            <div class="hub-card-body">
+              <span class="hub-card-cat culture">Culture</span>
+              <h3 class="hub-card-title">The Grime Renaissance Nobody is Talking About</h3>
+              <p class="hub-card-excerpt">How a new wave of artists is reclaiming the streets — one bar at a time. This is not a revival, it's an evolution.</p>
+              <div class="hub-card-footer">
+                <span class="hub-card-meta">By Marcus Webb · 10 min</span>
+                <span class="hub-card-reads">7.8K reads</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="hub-card fade-up" data-category="features" id="hub-card-3">
+            <div class="hub-card-img"><img src="images/artist3.png" alt="Afropop Diaspora" loading="lazy"/></div>
+            <div class="hub-card-body">
+              <span class="hub-card-cat features">Feature</span>
+              <h3 class="hub-card-title">Afropop &amp; The Diaspora: New Codes, New Language</h3>
+              <p class="hub-card-excerpt">Inside the cross-continental movement reshaping popular music from Lagos to London and beyond.</p>
+              <div class="hub-card-footer">
+                <span class="hub-card-meta">By Adaeze Nwosu · 7 min</span>
+                <span class="hub-card-reads">5.1K reads</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="hub-card fade-up" data-category="reviews" id="hub-card-4">
+            <div class="hub-card-img"><img src="images/album1.png" alt="ANTAUSER Dark Stasis" loading="lazy"/></div>
+            <div class="hub-card-body">
+              <span class="hub-card-cat reviews">Review</span>
+              <h3 class="hub-card-title">ANTAUSER — Dark Stasis: A Masterclass in Controlled Chaos</h3>
+              <p class="hub-card-excerpt">An album that weaponises silence as effectively as it does sound. Dark Stasis is a five-star debut demanding repeat listens.</p>
+              <div class="hub-card-footer">
+                <span class="hub-card-meta">By Tunde Obi · 5 min</span>
+                <span class="hub-card-reads">3.9K reads</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="hub-card fade-up" data-category="interviews" id="hub-card-5">
+            <div class="hub-card-img"><img src="images/editorial2.png" alt="Eera interview" loading="lazy"/></div>
+            <div class="hub-card-body">
+              <span class="hub-card-cat interviews">Interview</span>
+              <h3 class="hub-card-title">Eera in Conversation: "I Don't Make Songs. I Build Rooms."</h3>
+              <p class="hub-card-excerpt">An intimate sit-down with Nigeria's most talked-about new artist about building sound worlds and the silence in between.</p>
+              <div class="hub-card-footer">
+                <span class="hub-card-meta">By Fatima Lal · 9 min</span>
+                <span class="hub-card-reads">11.3K reads</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="hub-card fade-up" data-category="culture" id="hub-card-6">
+            <div class="hub-card-img"><img src="images/story1.png" alt="Underground culture" loading="lazy"/></div>
+            <div class="hub-card-body">
+              <span class="hub-card-cat culture">Culture</span>
+              <h3 class="hub-card-title">The Underground is Mainstream Now. Is That a Problem?</h3>
+              <p class="hub-card-excerpt">As streaming algorithms push niche sounds into the spotlight, we ask: what happens to the underground when everyone's watching?</p>
+              <div class="hub-card-footer">
+                <span class="hub-card-meta">By Marcus Webb · 12 min</span>
+                <span class="hub-card-reads">9.6K reads</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Trending Sidebar -->
+        <aside class="hub-sidebar">
+          <div class="hub-sidebar-block">
+            <h3 class="hub-sidebar-title">Trending Now</h3>
+            <ol class="trending-list">
+              <li class="trending-list-item" id="trending-1">
+                <span class="trending-num">01</span>
+                <div>
+                  <div class="trending-item-title">Eera in Conversation: "I Don't Make Songs. I Build Rooms."</div>
+                  <div class="trending-item-meta">11.3K reads</div>
+                </div>
+              </li>
+              <li class="trending-list-item" id="trending-2">
+                <span class="trending-num">02</span>
+                <div>
+                  <div class="trending-item-title">The Underground is Mainstream Now. Is That a Problem?</div>
+                  <div class="trending-item-meta">9.6K reads</div>
+                </div>
+              </li>
+              <li class="trending-list-item" id="trending-3">
+                <span class="trending-num">03</span>
+                <div>
+                  <div class="trending-item-title">The Grime Renaissance Nobody is Talking About</div>
+                  <div class="trending-item-meta">7.8K reads</div>
+                </div>
+              </li>
+              <li class="trending-list-item" id="trending-4">
+                <span class="trending-num">04</span>
+                <div>
+                  <div class="trending-item-title">Afropop &amp; The Diaspora: New Codes, New Language</div>
+                  <div class="trending-item-meta">5.1K reads</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Newsletter CTA -->
+          <div class="hub-newsletter fade-up" id="hubNewsletter">
+            <div class="newsletter-icon">✉</div>
+            <h4 class="newsletter-title">The Traverce Dispatch</h4>
+            <p class="newsletter-sub">Weekly editorial drops, exclusive interviews, and access to the underground. No spam.</p>
+            <form class="newsletter-form" id="newsletterForm" onsubmit="return false;">
+              <input type="email" class="newsletter-input" placeholder="your@email.com" aria-label="Email address" id="newsletterEmail"/>
+              <button type="submit" class="btn-primary newsletter-btn" id="newsletterSubmit">Subscribe</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PAGE: SHOP
+  ════════════════════════════════════════════════ -->
+  <div class="page-view" id="page-shop">
+
+    <!-- Shop Hero / Drop Banner -->
+    <section class="shop-hero" aria-label="Exclusive Drop Banner">
+      <div class="shop-hero-bg">
+        <img src="images/story2.png" alt="Exclusive Drop" loading="eager"/>
+      </div>
+      <div class="shop-hero-overlay"></div>
+      <div class="shop-hero-content container">
+        <div class="drop-eyebrow">
+          <span class="drop-badge">Limited Drop</span>
+          <span class="drop-eyebrow-text">Available while stocks last</span>
+        </div>
+        <h1 class="shop-hero-title">Eera x Traverce<br><em>Collector's Edition</em></h1>
+        <p class="shop-hero-sub">Signed vinyl. Numbered prints. Exclusive apparel. The rarest drop of the year.</p>
+        <div class="shop-hero-countdown" id="shopCountdown" aria-label="Countdown to drop">
+          <div class="countdown-unit"><span class="countdown-num" id="cd-hours">04</span><span class="countdown-label">Hours</span></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><span class="countdown-num" id="cd-mins">22</span><span class="countdown-label">Mins</span></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><span class="countdown-num" id="cd-secs">09</span><span class="countdown-label">Secs</span></div>
+        </div>
+        <a href="#shop-products" class="btn-primary" id="shop-drop-btn">Shop the Drop</a>
+      </div>
+    </section>
+
+    <main class="shop-main container" id="shop-products">
+
+      <!-- Category Pills -->
+      <div class="shop-cats fade-up" role="tablist" aria-label="Product categories">
+        <button class="shop-cat active" data-shopcat="all" id="shopcat-all" role="tab">All Products</button>
+        <button class="shop-cat" data-shopcat="vinyl" id="shopcat-vinyl" role="tab">Vinyl</button>
+        <button class="shop-cat" data-shopcat="apparel" id="shopcat-apparel" role="tab">Apparel</button>
+        <button class="shop-cat" data-shopcat="prints" id="shopcat-prints" role="tab">Prints</button>
+        <button class="shop-cat" data-shopcat="bundles" id="shopcat-bundles" role="tab">Bundles</button>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="shop-grid">
+
+        <article class="product-card fade-up" data-shopcat="vinyl" id="product-1">
+          <div class="product-img">
+            <img src="images/album1.png" alt="Hollow Frequencies Vinyl" loading="lazy"/>
+            <div class="product-badge new">New Drop</div>
+            <div class="product-overlay">
+              <button class="product-add-btn" data-product="Hollow Frequencies Vinyl" data-price="38">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Vinyl</div>
+            <div class="product-name">Hollow Frequencies — Ltd. Vinyl</div>
+            <div class="product-artist">Eera</div>
+            <div class="product-price">£38.00</div>
+          </div>
+        </article>
+
+        <article class="product-card fade-up" data-shopcat="apparel" id="product-2">
+          <div class="product-img">
+            <img src="images/editorial1.png" alt="Traverce Signature Tee" loading="lazy"/>
+            <div class="product-badge limited">Limited</div>
+            <div class="product-overlay">
+              <button class="product-add-btn" data-product="Traverce Signature Tee" data-price="45">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Apparel</div>
+            <div class="product-name">Traverce Signature Tee</div>
+            <div class="product-artist">Traverce Merch</div>
+            <div class="product-price">£45.00</div>
+          </div>
+        </article>
+
+        <article class="product-card fade-up" data-shopcat="vinyl" id="product-3">
+          <div class="product-img">
+            <img src="images/album2.png" alt="Pulse Lines Vinyl" loading="lazy"/>
+            <div class="product-overlay">
+              <button class="product-add-btn" data-product="Pulse Lines Vinyl" data-price="32">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Vinyl</div>
+            <div class="product-name">Pulse Lines — Coloured Vinyl</div>
+            <div class="product-artist">Solène</div>
+            <div class="product-price">£32.00</div>
+          </div>
+        </article>
+
+        <article class="product-card fade-up" data-shopcat="prints" id="product-4">
+          <div class="product-img">
+            <img src="images/editorial2.png" alt="Eera Studio Print" loading="lazy"/>
+            <div class="product-badge exclusive">Exclusive</div>
+            <div class="product-overlay">
+              <button class="product-add-btn" data-product="Eera Studio Print" data-price="75">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Print</div>
+            <div class="product-name">Eera — Signed Studio Print</div>
+            <div class="product-artist">Eera × Traverce</div>
+            <div class="product-price">£75.00</div>
+          </div>
+        </article>
+
+        <article class="product-card fade-up" data-shopcat="apparel" id="product-5">
+          <div class="product-img">
+            <img src="images/story2.png" alt="Neuric Hoodie" loading="lazy"/>
+            <div class="product-overlay">
+              <button class="product-add-btn" data-product="Neuric Hoodie" data-price="65">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Apparel</div>
+            <div class="product-name">Neuríc "Experimental" Hoodie</div>
+            <div class="product-artist">Neuríc × Traverce</div>
+            <div class="product-price">£65.00</div>
+          </div>
+        </article>
+
+        <article class="product-card fade-up" data-shopcat="bundles" id="product-6">
+          <div class="product-img">
+            <img src="images/story1.png" alt="Traverce Bundle" loading="lazy"/>
+            <div class="product-badge bundle">Best Value</div>
+            <div class="product-overlay">
+              <button class="product-add-btn" data-product="Ultimate Fan Bundle" data-price="120">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Bundle</div>
+            <div class="product-name">Ultimate Fan Bundle</div>
+            <div class="product-artist">Vinyl + Tee + Print</div>
+            <div class="product-price">£120.00 <span class="product-was">£158.00</span></div>
+          </div>
+        </article>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PAGE: ABOUT
+  ════════════════════════════════════════════════ -->
+  <div class="page-view" id="page-about">
+    <section class="about-hero fade-up">
+      <div class="container">
+        <div class="hero-eyebrow">
+          <div class="hero-eyebrow-line"></div>
+          <span class="hero-eyebrow-text">The Traverce Narrative</span>
+        </div>
+        <h1 class="about-hero-title">Crafting the<br>future of <em>Sound</em></h1>
+        <p class="about-hero-subtitle">We are a platform, taste company, and distillery of cultural editorial excellence.</p>
+      </div>
+      <div class="about-hero-bg"></div>
+    </section>
+
+    <!-- MISSION BANNER (Yellow) -->
+    <section class="radio-banner" id="about-mission">
+      <div class="container about-banner-inner">
+        <h2 class="about-us-title">About Us</h2>
+      </div>
+    </section>
+
+    <!-- BRAND PILLARS -->
+    <section class="pillars" id="about-pillars">
+      <div class="pillar-row fade-up" id="pillar-about">
+        <div class="pillar-text">
+          <div class="pillar-label">Our Philosophy</div>
+          <h2 class="pillar-title">We are a curation,<br>taste &amp; culture company.</h2>
+          <p class="pillar-body">Traverce aims to be a tool for discovering, crafting, and amplifying boundary-pushing music. We find our focus on discovery artists with one unwavering conviction: extraordinary underground sounds should be heard. Unapologetically championing the new sound frontier.</p>
+        </div>
+        <div class="pillar-icon-wrap">
+          <div class="pillar-icon-frame">
+            <svg class="pillar-svg" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="10" y="10" width="200" height="180" rx="8" fill="#1a1208" stroke="#FFD042" stroke-width="2"/>
+              <rect x="20" y="20" width="180" height="140" rx="4" fill="#0d0b05" stroke="#5a4a20" stroke-width="1"/>
+              <path d="M 30 140 A 80 80 0 0 1 190 140" fill="none" stroke="#333" stroke-width="1.5"/>
+              <line x1="110" y1="74" x2="110" y2="82" stroke="#FFD042" stroke-width="1.5"/>
+              <path d="M 30 140 A 80 80 0 0 1 95 84" fill="none" stroke="#4ade80" stroke-width="4" opacity="0.6"/>
+              <path d="M 95 84 A 80 80 0 0 1 155 84" fill="none" stroke="#FFD042" stroke-width="4" opacity="0.6"/>
+              <path d="M 155 84 A 80 80 0 0 1 190 140" fill="none" stroke="#f87171" stroke-width="4" opacity="0.6"/>
+              <line x1="110" y1="140" x2="68" y2="92" stroke="#FFD042" stroke-width="2.5" stroke-linecap="round" class="vu-needle"/>
+              <circle cx="110" cy="140" r="5" fill="#FFD042"/>
+              <text x="110" y="175" fill="#FFD042" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">VU</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="pillar-row reverse fade-up" id="pillar-discovery">
+        <div class="pillar-icon-wrap">
+          <div class="pillar-icon-frame">
+            <svg class="pillar-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="110" cy="110" r="100" fill="#1a1208" stroke="#FFD042" stroke-width="2"/>
+              <circle cx="110" cy="110" r="48" fill="#1a1208"/>
+              <text x="110" y="100" fill="#FFD042" font-size="7" font-family="monospace" text-anchor="middle" font-weight="bold">TRAVERCE</text>
+              <circle cx="110" cy="110" r="5" fill="#0a0a0a" stroke="#FFD042" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+        <div class="pillar-text">
+          <div class="pillar-label">Discovery</div>
+          <h2 class="pillar-title">Find what the world<br>hasn't heard yet.</h2>
+          <p class="pillar-body">We are the bridge for listeners to access breakthrough talent. Our mission is to ensure that extraordinary underground sounds aren't just created, but actually explored and celebrated.</p>
+        </div>
+      </div>
+
+      <div class="pillar-row fade-up" id="pillar-curation">
+        <div class="pillar-text">
+          <div class="pillar-label">Curation</div>
+          <h2 class="pillar-title">Selection crafted with<br>intent and depth.</h2>
+          <p class="pillar-body">Selection matters. We focus on artists with a visionary approach, ensuring our platform's sonic identity remains as distinct as the cultures we champion.</p>
+        </div>
+        <div class="pillar-icon-wrap">
+          <div class="pillar-icon-frame">
+            <svg class="pillar-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="110" cy="110" r="100" fill="#1a1208" stroke="#FFD042" stroke-width="2"/>
+              <text x="110" y="30" fill="#FFD042" font-size="14" font-family="monospace" text-anchor="middle" font-weight="bold">N</text>
+              <polygon points="110,52 117,110 110,118 103,110" fill="#FFD042"/>
+              <polygon points="110,168 117,110 110,102 103,110" fill="#333"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER (Global) -->
+  <footer class="footer" id="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand-col">
+          <div class="footer-brand-name">Traverce</div>
+          <p class="footer-tagline">The new sound frontier.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="#home" data-tab="home">Home</a></li>
+            <li><a href="#artist" data-tab="artist">Artist Profile</a></li>
+            <li><a href="#hub" data-tab="hub">Content Hub</a></li>
+            <li><a href="#shop" data-tab="shop">Shop</a></li>
+            <li><a href="#about" data-tab="about">About Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Narrative</h4>
+          <ul>
+            <li><a href="#about" data-tab="about">Our Story</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Legal</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Traverce. Culture is practice.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════
+       GLOBAL CHART REPORT TEMPLATE (Hidden from UI)
+       Optimized for 1080x1920 (9:16) export
+  ════════════════════════════════════════════════ -->
+  <div id="reportTemplate" class="report-export">
+    <div class="report-inner">
+      <header class="report-header">
+        <div class="report-brand">Traverce</div>
+        <div class="report-title-wrap">
+          <h1 class="report-title">Global Charts</h1>
+          <p class="report-date" id="reportDate">OCTOBER 2024</p>
+        </div>
+      </header>
+
+      <div class="report-rows" id="reportRows">
+        <!-- Rows will be populated by JS -->
+      </div>
+
+      <footer class="report-footer">
+        <div class="report-footer-left">&copy; <span id="reportYear">2024</span> TRAVERCE MEDIA</div>
+        <div class="report-footer-right">TRAVERCE.CO</div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SHARE MODAL
+  ════════════════════════════════════════════════ -->
+  <div class="share-modal-overlay" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <div class="share-modal-content">
+      <button class="share-modal-close" id="shareClose" aria-label="Close share dialog">✕</button>
+      <h3 class="share-modal-title" id="shareModalTitle">Share Global Charts</h3>
+      <p class="share-modal-desc">Select a platform to share the latest charts</p>
+      
+      <div class="share-options">
+        <button class="share-option-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+          Twitter / X
+        </button>
+        <button class="share-option-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          WhatsApp
+        </button>
+        <button class="share-option-btn" id="shareDownloadBtn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download Graphic
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

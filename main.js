@@ -1,0 +1,595 @@
+/* ============================================================
+   TRAVERCE — main.js
+   Tab Router, Search, Cart, Lyrics, Filters, Countdown, Report Export
+   ============================================================ */
+
+import * as htmlToImage from 'html-to-image';
+
+(function () {
+  'use strict';
+
+  /* ── SPOTIFY PLAYLIST DATA (Mocked due to API Restrictions) ── */
+  // The Spotify Web API now strictly requires User OAuth (Log in with Spotify) 
+  // to fetch any playlist tracks. Client Credentials will always throw a 403.
+  // We've hardcoded your "Traverce Top 10" playlist here to keep the site fast and static.
+  async function fetchSpotifyCharts() {
+    return [
+      {
+        rank: '01',
+        name: 'I Choose You',
+        artist: 'Dizmo, Kupa Kontra',
+        year: 2024,
+        image: 'https://i.scdn.co/image/ab67616d0000b273b5da614ed3a9fb3da51bb31c', // Dizmo cover
+        plays: 'NEW',
+        trend: 'new'
+      },
+      {
+        rank: '02',
+        name: 'Waistline',
+        artist: 'Jay Rox',
+        year: 2024,
+        image: 'https://i.scdn.co/image/ab67616d0000b2734f2d790757a3e87b7a67f0dc', // Jay Rox cover
+        plays: '4:32',
+        trend: 'up'
+      },
+      {
+        rank: '03',
+        name: 'Kale Bwangu',
+        artist: 'T-Low, G-FIVE, Chef 187',
+        year: 2024,
+        image: 'https://i.scdn.co/image/ab67616d0000b273b64cdaf929532fe4a5d893ac', // Kale Bwangu cover
+        plays: '3:15',
+        trend: 'flat'
+      },
+      {
+        rank: '04',
+        name: 'Jahman Juice',
+        artist: 'Slapdee, 76 Drums',
+        year: 2024,
+        image: 'https://i.scdn.co/image/ab67616d0000b273f32eab9c815ec584efcb222b', // Jahman Juice cover
+        plays: '5:10',
+        trend: 'down'
+      },
+      {
+        rank: '05',
+        name: 'So Mone',
+        artist: 'Yo Maps, Tay Grin',
+        year: 2024,
+        image: 'https://i.scdn.co/image/ab67616d0000b27367cebae5134eeb88cbeaec7f', // So Mone cover
+        plays: '3:58',
+        trend: 'up'
+      }
+    ];
+  }
+
+  function renderCharts(tracks) {
+    const gcRowsCont = document.querySelector('.gc-rows');
+    if (!gcRowsCont || !tracks) return;
+
+    gcRowsCont.innerHTML = '';
+    tracks.forEach(track => {
+      const row = document.createElement('div');
+      row.className = 'gc-row fade-up';
+      row.innerHTML = `
+        <div class="gc-num">${track.rank}</div>
+        <div class="gc-thumb">
+          <img src="${track.image}" alt="${track.name} cover">
+        </div>
+        <div class="gc-info">
+          <div class="gc-track-name">${track.name}</div>
+          <div class="gc-track-sub">${track.artist} · ${track.year}</div>
+        </div>
+        <div class="gc-meta">
+          <div class="gc-trend gc-new">${track.trend.toUpperCase()}</div>
+          <div class="gc-plays">${track.plays}</div>
+        </div>
+      `;
+      gcRowsCont.appendChild(row);
+
+      // Store the image for the report generator
+      row.dataset.spotifyImg = track.image;
+    });
+
+    // Re-init fade-ups for new elements
+    initFadeUps(document.getElementById('page-home'));
+  }
+
+  /* ── Refs ─────────────────────────────────────────────────── */
+  const nav           = document.getElementById('mainNav');
+  const navToggle     = document.getElementById('navToggle');
+  const searchBtn     = document.getElementById('searchBtn');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchClose   = document.getElementById('searchClose');
+  const searchInput   = document.getElementById('searchInput');
+  const hero          = document.getElementById('hero');
+  const cartBadge     = document.getElementById('cartBadge');
+
+  /* ── CART STATE ────────────────────────────────────────────── */
+  let cartCount = 0;
+
+  function updateCart(count) {
+    cartCount = count;
+    if (cartBadge) {
+      cartBadge.textContent = cartCount;
+      cartBadge.classList.add('pop');
+      setTimeout(() => cartBadge.classList.remove('pop'), 250);
+    }
+  }
+
+  /* ── TAB ROUTER ────────────────────────────────────────────── */
+  const tabs      = document.querySelectorAll('.nav-tab');
+  const pages     = document.querySelectorAll('.page-view');
+  const navLogo   = document.querySelector('.nav-logo');
+
+  function switchTab(tabId) {
+    // Deactivate all
+    tabs.forEach(t => t.classList.remove('active'));
+    pages.forEach(p => {
+      p.classList.remove('active', 'fade-in');
+    });
+
+    // Activate target tab
+    const activeTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
+    if (activeTab) activeTab.classList.add('active');
+
+    // Show target page with fade
+    const targetPage = document.getElementById(`page-${tabId}`);
+    if (targetPage) {
+      targetPage.classList.add('active');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          targetPage.classList.add('fade-in');
+        });
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Re-init fade-up animations for the new page
+    initFadeUps(targetPage);
+
+    // Reinit hero if going home
+    if (tabId === 'home' && hero) {
+      requestAnimationFrame(() => {
+        setTimeout(() => hero.classList.add('loaded'), 100);
+      });
+    }
+  }
+
+  // Wire up tab clicks
+  tabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tabId = tab.dataset.tab;
+      if (tabId) {
+        history.pushState({ tab: tabId }, '', `#${tabId}`);
+        switchTab(tabId);
+        // Close mobile nav if open
+        nav.classList.remove('mobile-open');
+        navToggle && navToggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
+  // Logo always goes home
+  if (navLogo) {
+    navLogo.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.pushState({ tab: 'home' }, '', '#home');
+      switchTab('home');
+    });
+  }
+
+  // Hero CTA buttons (tab switching)
+  document.querySelectorAll('[data-tab]').forEach(el => {
+    if (el.classList.contains('nav-tab') || el.classList.contains('nav-logo')) return;
+    el.addEventListener('click', (e) => {
+      const tabId = el.dataset.tab;
+      if (tabId) {
+        e.preventDefault();
+        history.pushState({ tab: tabId }, '', `#${tabId}`);
+        switchTab(tabId);
+      }
+    });
+  });
+
+  // Handle browser back/forward
+  window.addEventListener('popstate', (e) => {
+    const tabId = (e.state && e.state.tab) || getHashTab();
+    switchTab(tabId || 'home');
+  });
+
+  function getHashTab() {
+    const hash = window.location.hash.replace('#', '');
+    return ['home', 'artist', 'hub', 'shop'].includes(hash) ? hash : 'home';
+  }
+
+  // Init on load
+  const initialTab = getHashTab();
+  switchTab(initialTab);
+
+  /* ── NAV: sticky scroll ────────────────────────────────────── */
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  /* ── Hero entry animation ───────────────────────────────────── */
+  if (hero) {
+    requestAnimationFrame(() => {
+      setTimeout(() => hero.classList.add('loaded'), 100);
+    });
+  }
+
+  /* ── MOBILE NAV TOGGLE ─────────────────────────────────────── */
+  if (navToggle) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = nav.classList.toggle('mobile-open');
+      navToggle.setAttribute('aria-expanded', isOpen.toString());
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+  }
+
+  /* ── SEARCH OVERLAY ────────────────────────────────────────── */
+  function openSearch() {
+    searchOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => searchInput && searchInput.focus(), 150);
+  }
+  function closeSearch() {
+    searchOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if (searchBtn)   searchBtn.addEventListener('click', openSearch);
+  if (searchClose) searchClose.addEventListener('click', closeSearch);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSearch();
+  });
+  if (searchOverlay) {
+    searchOverlay.addEventListener('click', (e) => {
+      if (e.target === searchOverlay) closeSearch();
+    });
+  }
+
+  /* ── FADE-UP INTERSECTION OBSERVER ─────────────────────────── */
+  function initFadeUps(scope) {
+    const root = scope || document;
+    const fadeEls = root.querySelectorAll('.fade-up:not(.visible)');
+    if (!('IntersectionObserver' in window) || !fadeEls.length) {
+      fadeEls.forEach(el => el.classList.add('visible'));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const parent = entry.target;
+          const siblings = parent.parentElement
+            ? [...parent.parentElement.children].filter(el => el.classList.contains('fade-up'))
+            : [parent];
+          const idx = siblings.indexOf(parent);
+          setTimeout(() => parent.classList.add('visible'), Math.min(idx * 80, 400));
+          observer.unobserve(parent);
+        }
+      });
+    }, { threshold: 0.10, rootMargin: '0px 0px -40px 0px' });
+    fadeEls.forEach(el => observer.observe(el));
+  }
+
+  /* ── SONICS CARD TILT ───────────────────────────────────────── */
+  document.querySelectorAll('.sonics-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(600px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) translateY(-3px)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+
+  /* ── STORY CARD HOVER LIFT ──────────────────────────────────── */
+  document.querySelectorAll('.story-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'translateY(-4px)';
+      card.style.transition = 'transform 220ms cubic-bezier(0.16,1,0.3,1)';
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+
+  /* ── RADIO TRACK ROTATION ───────────────────────────────────── */
+  const tracks = [
+    'KAYGRÖ — "Burnt Frequencies"',
+    'NÓBEN — "Shadows & Glass"',
+    'ANTAUSER — "Cold Current"',
+    'AMARA K — "Golden Orbit"',
+    'EERA — "Hollow Room"',
+  ];
+  let trackIdx = 0;
+  const nowTrackEl = document.querySelector('.radio-now-track');
+  if (nowTrackEl) {
+    setInterval(() => {
+      trackIdx = (trackIdx + 1) % tracks.length;
+      nowTrackEl.style.opacity = '0';
+      setTimeout(() => {
+        nowTrackEl.textContent = tracks[trackIdx];
+        nowTrackEl.style.opacity = '1';
+      }, 300);
+      nowTrackEl.style.transition = 'opacity 300ms ease';
+    }, 6000);
+  }
+
+  /* ── REDUCED MOTION ─────────────────────────────────────────── */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.radio-wave span, .ticker-track, .hero-scroll-line, .player-waveform span')
+      .forEach(el => { el.style.animationPlayState = 'paused'; });
+  }
+
+  /* ── ARTIST PAGE: LYRICS TOGGLE ─────────────────────────────── */
+  const lyricsToggle = document.getElementById('lyricsToggle');
+  const lyricsBody   = document.getElementById('lyricsBody');
+  if (lyricsToggle && lyricsBody) {
+    lyricsToggle.addEventListener('click', () => {
+      const isOpen = lyricsBody.classList.toggle('open');
+      lyricsToggle.textContent = isOpen ? 'Hide Lyrics' : 'Show Lyrics';
+    });
+  }
+
+  /* ── ARTIST PAGE: PLAYER MOCK ───────────────────────────────── */
+  const playerPlay = document.getElementById('playerPlay');
+  let isPlaying = false;
+  if (playerPlay) {
+    playerPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      const waveform = document.getElementById('playerWaveform');
+      if (waveform) {
+        waveform.querySelectorAll('span').forEach(s => {
+          s.style.animationPlayState = isPlaying ? 'running' : 'paused';
+        });
+      }
+      playerPlay.innerHTML = isPlaying
+        ? `<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="1" width="3" height="10"/><rect x="7" y="1" width="3" height="10"/></svg>`
+        : `<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg>`;
+    });
+  }
+
+  /* ── CONTENT HUB: CATEGORY FILTER ──────────────────────────── */
+  const hubFilters = document.querySelectorAll('.hub-filter');
+  const hubCards   = document.querySelectorAll('.hub-card');
+  hubFilters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      hubFilters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      hubCards.forEach(card => {
+        if (filter === 'all' || card.dataset.category === filter) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  /* ── SHOP: CATEGORY FILTER ──────────────────────────────────── */
+  const shopCats    = document.querySelectorAll('.shop-cat');
+  const productCards = document.querySelectorAll('.product-card');
+  shopCats.forEach(btn => {
+    btn.addEventListener('click', () => {
+      shopCats.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.shopcat;
+      productCards.forEach(card => {
+        if (cat === 'all' || card.dataset.shopcat === cat) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  /* ── SHOP: ADD TO CART ──────────────────────────────────────── */
+  document.querySelectorAll('.product-add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cartCount++;
+      updateCart(cartCount);
+      const original = btn.textContent;
+      btn.textContent = '✓ Added!';
+      btn.style.background = '#34d399';
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.style.background = '';
+      }, 1500);
+    });
+  });
+
+  /* ── SHOP: COUNTDOWN TIMER ──────────────────────────────────── */
+  let dropSeconds = 4 * 3600 + 22 * 60 + 9;
+  const cdHours = document.getElementById('cd-hours');
+  const cdMins  = document.getElementById('cd-mins');
+  const cdSecs  = document.getElementById('cd-secs');
+
+  function updateCountdown() {
+    if (dropSeconds <= 0) return;
+    dropSeconds--;
+    const h = Math.floor(dropSeconds / 3600);
+    const m = Math.floor((dropSeconds % 3600) / 60);
+    const s = dropSeconds % 60;
+    if (cdHours) cdHours.textContent = String(h).padStart(2, '0');
+    if (cdMins)  cdMins.textContent  = String(m).padStart(2, '0');
+    if (cdSecs)  cdSecs.textContent  = String(s).padStart(2, '0');
+  }
+  if (cdHours) setInterval(updateCountdown, 1000);
+
+  /* ── NEWSLETTER FORM ────────────────────────────────────────── */
+  const newsletterForm = document.getElementById('newsletterForm');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn   = document.getElementById('newsletterSubmit');
+      const input = document.getElementById('newsletterEmail');
+      if (btn && input && input.value) {
+        btn.textContent = '✓ Subscribed!';
+        btn.style.background = '#34d399';
+        btn.style.color = '#0a0a0a';
+        input.value = '';
+        setTimeout(() => {
+          btn.textContent = 'Subscribe';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 3000);
+      }
+    });
+  }
+
+  /* ── ACTIVE NAV ON SCROLL (HOME PAGE ONLY) ──────────────────── */
+  const sections = document.querySelectorAll('#page-home section[id]');
+  const sectionObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Nothing needed now — all nav items are tab-based
+      }
+    });
+  }, { threshold: 0.35 });
+  sections.forEach(s => sectionObserver.observe(s));
+
+  // Initialize Spotify Data on Load
+  (async function() {
+    const tracks = await fetchSpotifyCharts();
+    if (tracks) renderCharts(tracks);
+  })();
+
+  /* ── GLOBAL CHART: REPORT DOWNLOAD ─────────────────────────── */
+  const gcShareBtn = document.getElementById('gcShareBtn');
+  const shareModal = document.getElementById('shareModal');
+  const shareClose = document.getElementById('shareClose');
+  const shareDownloadBtn = document.getElementById('shareDownloadBtn');
+  
+  const reportTemplate = document.getElementById('reportTemplate');
+  const reportRowsCont = document.getElementById('reportRows');
+
+  // Map tracks to artist images (for the premium report)
+  const trackImages = {
+    'Hollow Frequencies': 'images/editorial2.png',
+    'Ocean Floor':        'images/artist1.png',
+    'Concrete Jungle':   'images/artist3.png',
+    'Groundbreaker':     'images/artist2.png',
+    'Pulse Lines':       'images/artist4.png'
+  };
+
+  async function downloadReport() {
+    if (!shareDownloadBtn || !reportTemplate || !reportRowsCont) return;
+
+    // Change button state
+    const originalText = shareDownloadBtn.innerHTML;
+    shareDownloadBtn.innerHTML = 'Generating...';
+    shareDownloadBtn.disabled = true;
+
+    try {
+      // 1. Populate current date
+      const now = new Date();
+      const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+      const reportDateEl = document.getElementById('reportDate');
+      const reportYearEl = document.getElementById('reportYear');
+      if (reportDateEl) reportDateEl.textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+      if (reportYearEl) reportYearEl.textContent = now.getFullYear();
+
+      // 2. Extract data from live charts
+      const liveRows = document.querySelectorAll('.gc-row');
+      reportRowsCont.innerHTML = ''; // Clear template
+
+      liveRows.forEach(row => {
+        const num = row.querySelector('.gc-num').textContent;
+        const trackName = row.querySelector('.gc-track-name').textContent;
+        const trackSub = row.querySelector('.gc-track-sub').textContent;
+        const trendIcon = row.querySelector('.gc-trend').textContent;
+        const trendClass = row.querySelector('.gc-trend').classList.contains('gc-up') ? 'up' : 
+                           row.querySelector('.gc-trend').classList.contains('gc-down') ? 'down' : 'new';
+        const plays = row.querySelector('.gc-plays').textContent;
+        
+        // Use the Spotify image stored on the row if available, otherwise fallback
+        const imgSrc = row.dataset.spotifyImg || 'images/artist1.png';
+
+        // Create report row
+        const repRow = document.createElement('div');
+        repRow.className = 'report-row';
+        repRow.innerHTML = `
+          <div class="rep-num">${num}</div>
+          <div class="rep-avatar"><img src="${imgSrc}" alt="${trackName}"></div>
+          <div class="rep-info">
+            <div class="rep-track">${trackName}</div>
+            <div class="rep-meta">${trackSub}</div>
+          </div>
+          <div class="rep-trend">
+            <span class="rep-time">${plays}</span>
+            <span class="rep-arrow ${trendClass === 'up' ? 'legend-up' : trendClass === 'down' ? 'legend-down' : 'legend-new'}">
+               ${trendClass === 'up' ? '▲' : trendClass === 'down' ? '▼' : '■'}
+            </span>
+          </div>
+        `;
+        reportRowsCont.appendChild(repRow);
+      });
+
+      // 3. Pre-load images inside the template to prevent blank renders
+      const images = Array.from(reportTemplate.querySelectorAll('img'));
+      await Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve; // Continue even if one fails
+        });
+      }));
+
+      // Add a tiny delay to allow the browser to paint text/layout
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const dataUrl = await htmlToImage.toPng(reportTemplate, {
+        width: 1080,
+        height: 1920,
+        pixelRatio: 1, // Ensures exactly 1080x1920 output
+        style: {
+          transform: 'none',
+          left: '0',
+          top: '0',
+          position: 'static',
+          zIndex: '1',
+          opacity: '1',
+          pointerEvents: 'auto'
+        }
+      });
+
+      // 4. Trigger download
+      const link = document.createElement('a');
+      link.download = `traverce-global-report-${now.toISOString().slice(0,10)}.png`;
+      link.href = dataUrl;
+      link.click();
+
+    } catch (error) {
+      console.error('Report generation failed:', error);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      shareDownloadBtn.innerHTML = originalText;
+      shareDownloadBtn.disabled = false;
+    }
+  }
+
+  if (gcShareBtn && shareModal && shareClose) {
+    gcShareBtn.addEventListener('click', () => {
+      shareModal.classList.add('open');
+    });
+
+    shareClose.addEventListener('click', () => {
+      shareModal.classList.remove('open');
+    });
+
+    // Close when clicking outside content
+    shareModal.addEventListener('click', (e) => {
+      if (e.target === shareModal) {
+        shareModal.classList.remove('open');
+      }
+    });
+  }
+
+  if (shareDownloadBtn) {
+    shareDownloadBtn.addEventListener('click', downloadReport);
+  }
+
+})();
