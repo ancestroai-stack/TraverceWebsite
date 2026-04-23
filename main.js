@@ -19,7 +19,10 @@ import * as htmlToImage from 'html-to-image';
         name: 'I Choose You',
         artist: 'Dizmo, Kupa Kontra',
         year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b273b5da614ed3a9fb3da51bb31c', // Dizmo cover
+        image: 'https://i.scdn.co/image/ab67616d0000b273794a375f3b0d909c03f1fe34', // Dizmo cover
+        spotifyTrackId: '1DQ38R7QYabDg9h9xqwIsy',
+        trackUrl: 'https://open.spotify.com/track/1DQ38R7QYabDg9h9xqwIsy',
+        previewUrl: null,
         plays: 'NEW',
         trend: 'new'
       },
@@ -28,7 +31,10 @@ import * as htmlToImage from 'html-to-image';
         name: 'Waistline',
         artist: 'Jay Rox',
         year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b2734f2d790757a3e87b7a67f0dc', // Jay Rox cover
+        image: 'https://i.scdn.co/image/ab67616d0000b273d2c93bda9f36088da9aa260b', // Jay Rox cover
+        spotifyTrackId: '57j0tjcMAuSxwXHUhCG7OK',
+        trackUrl: 'https://open.spotify.com/track/57j0tjcMAuSxwXHUhCG7OK',
+        previewUrl: null,
         plays: '4:32',
         trend: 'up'
       },
@@ -37,7 +43,10 @@ import * as htmlToImage from 'html-to-image';
         name: 'Kale Bwangu',
         artist: 'T-Low, G-FIVE, Chef 187',
         year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b273b64cdaf929532fe4a5d893ac', // Kale Bwangu cover
+        image: 'https://i.scdn.co/image/ab67616d0000b2739f2055d4ac1d384feefa46bd', // Kale Bwangu cover
+        spotifyTrackId: '6xL5AnX3Ru4QhexzjEjStT',
+        trackUrl: 'https://open.spotify.com/track/6xL5AnX3Ru4QhexzjEjStT',
+        previewUrl: null,
         plays: '3:15',
         trend: 'flat'
       },
@@ -46,7 +55,10 @@ import * as htmlToImage from 'html-to-image';
         name: 'Jahman Juice',
         artist: 'Slapdee, 76 Drums',
         year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b273f32eab9c815ec584efcb222b', // Jahman Juice cover
+        image: 'https://i.scdn.co/image/ab67616d0000b273ab2c4c9426e3f64479480cee', // Jahman Juice cover
+        spotifyTrackId: '6KpCKlNrHyXewT7BNcJZzA',
+        trackUrl: 'https://open.spotify.com/track/6KpCKlNrHyXewT7BNcJZzA',
+        previewUrl: null,
         plays: '5:10',
         trend: 'down'
       },
@@ -55,15 +67,65 @@ import * as htmlToImage from 'html-to-image';
         name: 'So Mone',
         artist: 'Yo Maps, Tay Grin',
         year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b27367cebae5134eeb88cbeaec7f', // So Mone cover
+        image: 'https://i.scdn.co/image/ab67616d0000b27301be3547f7e9c7a6022a7759', // So Mone cover
+        spotifyTrackId: '0Azf3U8BVU8rv2pSCnjSoB',
+        trackUrl: 'https://open.spotify.com/track/0Azf3U8BVU8rv2pSCnjSoB',
+        previewUrl: null,
         plays: '3:58',
         trend: 'up'
       }
     ];
   }
 
+  function openSpotifyPlayer(track) {
+    if (!spotifyModal || !spotifyModalTitle || !spotifyModalDesc || !spotifyPlayerMount) return;
+
+    spotifyModalTitle.textContent = track?.name || 'Spotify Playback';
+    spotifyModalDesc.textContent = track?.artist || '';
+    spotifyPlayerMount.innerHTML = '';
+
+    if (track?.previewUrl) {
+      const audio = document.createElement('audio');
+      audio.className = 'spotify-preview-audio';
+      audio.controls = true;
+      audio.autoplay = true;
+      audio.src = track.previewUrl;
+      spotifyPlayerMount.appendChild(audio);
+      requestAnimationFrame(() => {
+        audio.play().catch(() => {});
+      });
+    } else if (track?.spotifyTrackId) {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://open.spotify.com/embed/track/${track.spotifyTrackId}?utm_source=generator`;
+      iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.title = `${track.name} on Spotify`;
+      spotifyPlayerMount.appendChild(iframe);
+
+      const hint = document.createElement('p');
+      hint.className = 'spotify-player-hint';
+      hint.textContent = 'Spotify does not expose a preview clip for this track, so this opens the official player.';
+      spotifyPlayerMount.appendChild(hint);
+    } else {
+      const fallback = document.createElement('p');
+      fallback.className = 'spotify-player-hint';
+      fallback.textContent = 'No playback source is available for this track.';
+      spotifyPlayerMount.appendChild(fallback);
+    }
+
+    spotifyModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSpotifyPlayer() {
+    if (!spotifyModal || !spotifyPlayerMount) return;
+    spotifyModal.classList.remove('open');
+    spotifyPlayerMount.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+
   function renderCharts(tracks) {
-    const gcRowsCont = document.querySelector('.gc-rows');
     if (!gcRowsCont || !tracks) return;
 
     gcRowsCont.innerHTML = '';
@@ -82,12 +144,23 @@ import * as htmlToImage from 'html-to-image';
         <div class="gc-meta">
           <div class="gc-trend gc-new">${track.trend.toUpperCase()}</div>
           <div class="gc-plays">${track.plays}</div>
+          <button class="gc-play-btn" type="button" aria-label="Play ${track.name}">
+            <span class="gc-play-icon">▶</span>
+            <span class="gc-play-label">${track.previewUrl ? 'Preview' : 'Spotify'}</span>
+          </button>
         </div>
       `;
       gcRowsCont.appendChild(row);
 
       // Store the image for the report generator
       row.dataset.spotifyImg = track.image;
+      row.dataset.spotifyTrackId = track.spotifyTrackId || '';
+      row.dataset.spotifyTrackUrl = track.trackUrl || '';
+      row.dataset.spotifyPreviewUrl = track.previewUrl || '';
+
+      row.addEventListener('click', () => {
+        openSpotifyPlayer(track);
+      });
     });
 
     // Re-init fade-ups for new elements
@@ -332,25 +405,7 @@ import * as htmlToImage from 'html-to-image';
     });
   }
 
-  /* ── ARTIST PAGE: PLAYER MOCK ───────────────────────────────── */
-  const playerPlay = document.getElementById('playerPlay');
-  let isPlaying = false;
-  if (playerPlay) {
-    playerPlay.addEventListener('click', () => {
-      isPlaying = !isPlaying;
-      const waveform = document.getElementById('playerWaveform');
-      if (waveform) {
-        waveform.querySelectorAll('span').forEach(s => {
-          s.style.animationPlayState = isPlaying ? 'running' : 'paused';
-        });
-      }
-      playerPlay.innerHTML = isPlaying
-        ? `<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="1" width="3" height="10"/><rect x="7" y="1" width="3" height="10"/></svg>`
-        : `<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M2 1l9 5-9 5V1z"/></svg>`;
-    });
-  }
-
-  /* ── CONTENT HUB: CATEGORY FILTER ──────────────────────────── */
+  /* CONTENT HUB: CATEGORY FILTER */
   const hubFilters = document.querySelectorAll('.hub-filter');
   const hubCards   = document.querySelectorAll('.hub-card');
   hubFilters.forEach(btn => {
@@ -462,9 +517,15 @@ import * as htmlToImage from 'html-to-image';
   const shareModal = document.getElementById('shareModal');
   const shareClose = document.getElementById('shareClose');
   const shareDownloadBtn = document.getElementById('shareDownloadBtn');
+  const spotifyModal = document.getElementById('spotifyModal');
+  const spotifyClose = document.getElementById('spotifyClose');
+  const spotifyModalTitle = document.getElementById('spotifyModalTitle');
+  const spotifyModalDesc = document.getElementById('spotifyModalDesc');
+  const spotifyPlayerMount = document.getElementById('spotifyPlayerMount');
   
   const reportTemplate = document.getElementById('reportTemplate');
   const reportRowsCont = document.getElementById('reportRows');
+  const gcRowsCont = document.querySelector('.gc-rows');
 
   // Map tracks to artist images (for the premium report)
   const trackImages = {
@@ -505,8 +566,7 @@ import * as htmlToImage from 'html-to-image';
                            row.querySelector('.gc-trend').classList.contains('gc-down') ? 'down' : 'new';
         const plays = row.querySelector('.gc-plays').textContent;
         
-        // Use the Spotify image stored on the row if available, otherwise fallback
-        const imgSrc = row.dataset.spotifyImg || 'images/artist1.png';
+        const imgSrc = row.dataset.spotifyImg;
 
         // Create report row
         const repRow = document.createElement('div');
@@ -592,4 +652,15 @@ import * as htmlToImage from 'html-to-image';
     shareDownloadBtn.addEventListener('click', downloadReport);
   }
 
+  if (spotifyModal && spotifyClose) {
+    spotifyClose.addEventListener('click', closeSpotifyPlayer);
+    spotifyModal.addEventListener('click', (e) => {
+      if (e.target === spotifyModal) {
+        closeSpotifyPlayer();
+      }
+    });
+  }
+
 })();
+
+
