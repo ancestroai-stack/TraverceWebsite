@@ -1,16 +1,44 @@
-name: Nightly Spotify Sync (Cloudflare Pages)
+name: Sync Artists and Push to GitHub
 
 on:
   schedule:
-    # Runs exactly at 03:00 AM every night automatically
     - cron: '0 3 * * *'
-  # Allows you to also trigger this script from the GitHub website manually
   workflow_dispatch:
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Trigger Cloudflare Pages Webhook
-        # Sends a POST request to the secret URL defined in GitHub Secrets
-        run: curl -X POST "${{ secrets.CLOUDFLARE_DEPLOY_WEBHOOK }}"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Artist Sync
+        env:
+          VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
+          VITE_SPOTIFY_CLIENT_SECRET: ${{ secrets.VITE_SPOTIFY_CLIENT_SECRET }}
+        run: node sync_artists.js
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add index.html main.js
+          if [ -n "$(git status --porcelain index.html main.js)" ]; then
+            git commit -m "chore: automated artist sync from spotify"
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
