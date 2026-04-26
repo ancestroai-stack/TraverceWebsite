@@ -276,7 +276,11 @@ async function sync() {
         console.log(`📡 Syncing metadata for: ${id}`);
         try {
             const data = await getArtistData(token, id);
-            artists.push(data);
+            if (data.releaseCount === 0 && data.followers === 0 && data.popularity === 0) {
+                console.warn(`⚠️ Skip artist ${data.name || id}: Profile is completely blank (no data).`);
+            } else {
+                artists.push(data);
+            }
         } catch (e) {
             console.warn(`⚠️ Skip artist ${id}:`, e.message);
         }
