@@ -27,6 +27,40 @@ async function getAccessToken() {
     return data.access_token;
 }
 
+async function getArtistBio(artistName) {
+    // 1. Try Wikipedia
+    try {
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(artistName)}&format=json`);
+        const data = await res.json();
+        const pages = data.query?.pages;
+        if (pages) {
+            const page = Object.values(pages)[0];
+            if (page && page.extract && !page.extract.includes("may refer to:")) {
+                return page.extract.split('\n').filter(p => p.trim() !== '').slice(0, 2).join('\n\n');
+            }
+        }
+    } catch (e) {
+        console.warn(`⚠️ Failed to fetch Wikipedia bio for ${artistName}`);
+    }
+
+    // 2. Fallback to Last.fm
+    try {
+        const res = await fetch(`https://www.last.fm/music/${encodeURIComponent(artistName)}/+wiki`);
+        if (res.ok) {
+            const html = await res.text();
+            const match = html.match(/<div class="wiki-content">([\s\S]*?)<\/div>/);
+            if (match) {
+                const text = match[1].replace(/<[^>]+>/g, '').trim();
+                return text.split('\n').filter(p => p.trim() !== '').slice(0, 2).join('\n\n');
+            }
+        }
+    } catch (e) {
+        console.warn(`⚠️ Failed to fetch Last.fm bio for ${artistName}`);
+    }
+
+    return '';
+}
+
 async function getPlaylistArtistIds() {
     console.log('📡 Fetching playlist page to extract artist IDs...');
     try {
@@ -115,6 +149,8 @@ async function getArtistData(token, id) {
         portraitUrl = FALLBACK_IMAGE;
     }
 
+    const bio = await getArtistBio(artist.name);
+
     return {
         id: artist.id,
         name: artist.name,
@@ -129,7 +165,8 @@ async function getArtistData(token, id) {
             image: r.images?.[0]?.url || FALLBACK_IMAGE,
             type: r.album_type
         })),
-        releaseCount: releaseCount
+        releaseCount: releaseCount,
+        bio: bio
     };
 }
 
@@ -203,14 +240,8 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
         <div class="artist-main container">
           <div class="artist-body-grid">
             <div class="artist-bio-col">
-              <div class="artist-section-label">Legacy & Influence</div>
-              <p class="artist-bio">
-                ${artist.name} continues to shape the ${artist.genres[0] || 'music'} landscape with a distinct artistic voice. 
-                Rooted in authentic storytelling and technical mastery, their presence in the Traverce ecosystem highlights the best-in-class artistry.
-              </p>
-              <p class="artist-bio">
-                With a catalog spanning ${artist.releaseCount} releases and a growing audience, they remain at the forefront of creative innovation and sonic excellence.
-              </p>
+              <div class="artist-section-label">About</div>
+              ${artist.bio ? artist.bio.split('\n\n').map(p => `<p class="artist-bio">${p}</p>`).join('\n              ') : `<p class="artist-bio">Biography currently unavailable.</p>`}
               <div class="artist-social-row">
                 <a href="https://open.spotify.com/artist/${artist.id}" target="_blank" class="social-btn" title="Spotify Profile">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.11 17.587c-.247.407-.78.533-1.187.287-2.614-1.6-5.903-1.96-9.782-1.07-.463.107-.927-.187-1.033-.653-.107-.463.187-.927.653-1.033 4.25-.97 7.893-.563 10.873 1.263.407.246.533.78.287 1.186v.02zm1.36-3.23c-.313.513-.98.673-1.493.36-2.993-1.84-7.553-2.373-11.087-1.293-.58.173-1.187-.147-1.36-.727-.173-.58.147-1.187.727-1.36 4.027-1.22 9.047-.633 12.527 1.507.513.313.673.98.36 1.493v.013zm.127-3.393c-3.587-2.127-9.513-2.327-12.953-1.287-.553.167-1.127-.16-1.293-.713-.167-.553.16-1.127.713-1.293 3.967-1.2 10.513-1 14.613 1.433.493.293.653.94.36 1.433-.293.493-.94.653-1.433.36z"/></svg>
@@ -241,6 +272,7 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
             </div>
           </div>
 
+          ${artist.bio ? `
           <div class="artist-lyrics fade-up" id="${artist.slug}-notes">
             <div class="lyrics-header">
               <h2 class="section-title">Career <span>Narrative</span></h2>
@@ -249,11 +281,11 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
             <div class="lyrics-body" id="${artist.slug}Body">
               <div class="lyrics-track-label">${artist.name} &mdash; Official Profile</div>
               <div class="lyrics-text">
-                <p>${artist.name} represents the forward-thinking sound of modern music. This profile is synchronized with Traverce's official playlist, ensuring fans always have access to the latest career milestones and releases.</p>
+                <p>${artist.bio.split('\n\n')[0]}</p>
                 <p>Explore their catalog on Spotify for a deeper dive into their artistic journey and unique sonic palette.</p>
               </div>
             </div>
-          </div>
+          </div>` : ''}
         </div>
       </article>
     </div>`;
