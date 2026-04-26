@@ -274,7 +274,11 @@ import * as htmlToImage from 'html-to-image';
 
   function getHashTab() {
     const hash = window.location.hash.replace('#', '');
-    return ['home', 'artist', 'hub', 'shop'].includes(hash) ? hash : 'home';
+    return ['home', 'artist', 
+      /* ARTIST_TABS_START */
+      'chef-187', 'frank-ro', 'kb', 'jc-kalinks', 'tio-nason', 'chewe', 'coziem', 'vleko',
+      /* ARTIST_TABS_END */
+      'hub', 'shop'].includes(hash) ? hash : 'home';
   }
 
   // Init on load
@@ -396,14 +400,29 @@ import * as htmlToImage from 'html-to-image';
   }
 
   /* ── ARTIST PAGE: LYRICS TOGGLE ─────────────────────────────── */
-  const lyricsToggle = document.getElementById('lyricsToggle');
-  const lyricsBody   = document.getElementById('lyricsBody');
-  if (lyricsToggle && lyricsBody) {
-    lyricsToggle.addEventListener('click', () => {
-      const isOpen = lyricsBody.classList.toggle('open');
-      lyricsToggle.textContent = isOpen ? 'Hide Lyrics' : 'Show Lyrics';
+  const noteTogglePairs = [
+    ['lyricsToggle', 'lyricsBody'],
+    /* ARTIST_TOGGLES_START */
+    ['chef-187Toggle', 'chef-187Body'],
+    ['frank-roToggle', 'frank-roBody'],
+    ['kbToggle', 'kbBody'],
+    ['jc-kalinksToggle', 'jc-kalinksBody'],
+    ['tio-nasonToggle', 'tio-nasonBody'],
+    ['cheweToggle', 'cheweBody'],
+    ['coziemToggle', 'coziemBody'],
+    ['vlekoToggle', 'vlekoBody'],
+    /* ARTIST_TOGGLES_END */
+  ];
+  noteTogglePairs.forEach(([toggleId, bodyId]) => {
+    const toggle = document.getElementById(toggleId);
+    const body = document.getElementById(bodyId);
+    if (!toggle || !body) return;
+
+    toggle.addEventListener('click', () => {
+      const isOpen = body.classList.toggle('open');
+      toggle.textContent = isOpen ? 'Hide Notes' : 'Show Notes';
     });
-  }
+  });
 
   /* CONTENT HUB: CATEGORY FILTER */
   const hubFilters = document.querySelectorAll('.hub-filter');

@@ -12,6 +12,10 @@ echo.
 echo  Starting Vite...
 echo.
 
+:: Automatically run the sync script before starting Vite
+echo  Running Spotify Sync...
+node sync_artists.js
+echo.
 :: Run Vite dev server
 npx vite --open --port 8000
 

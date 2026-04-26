@@ -1,0 +1,16 @@
+name: Nightly Spotify Sync (Cloudflare Pages)
+
+on:
+  schedule:
+    # Runs exactly at 03:00 AM every night automatically
+    - cron: '0 3 * * *'
+  # Allows you to also trigger this script from the GitHub website manually
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages Webhook
+        # Sends a POST request to the secret URL defined in GitHub Secrets
+        run: curl -X POST "${{ secrets.CLOUDFLARE_DEPLOY_WEBHOOK }}"
