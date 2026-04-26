@@ -6,7 +6,6 @@
   "scripts": {
     "predev": "node sync_artists.js",
     "dev": "vite",
-    "prebuild": "node sync_artists.js",
     "build": "vite build",
     "dist": "npm run build",
     "preview": "vite preview",

@@ -55,16 +55,19 @@ async function getArtistData(token, id) {
     let artist, albumsRaw, topTracks;
 
     const artistRes = await fetch(`https://api.spotify.com/v1/artists/${id}`, { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!artistRes.ok) throw new Error(`Artist API failed: ${artistRes.status} ${artistRes.statusText}`);
     artist = await artistRes.json();
 
     // Try to get top tracks from various markets to ensure we get a stable image
     for (const m of markets) {
         const topTracksRes = await fetch(`https://api.spotify.com/v1/artists/${id}/top-tracks?market=${m}`, { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!topTracksRes.ok) continue;
         topTracks = await topTracksRes.json();
         if (topTracks.tracks && topTracks.tracks.length > 0) break;
     }
 
     const albumsRes = await fetch(`https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single`, { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!albumsRes.ok) throw new Error(`Albums API failed: ${albumsRes.status} ${albumsRes.statusText}`);
     albumsRaw = await albumsRes.json();
 
     let releaseCount = albumsRaw.total || 0;
@@ -277,6 +280,13 @@ async function sync() {
         } catch (e) {
             console.warn(`⚠️ Skip artist ${id}:`, e.message);
         }
+        // Delay to respect API rate limits
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    if (artists.length === 0) {
+        console.error('❌ Failed to fetch data for any artists. Aborting sync to prevent wiping out the site.');
+        process.exit(1);
     }
 
     // 3. Sort
