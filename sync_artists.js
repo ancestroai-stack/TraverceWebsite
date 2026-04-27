@@ -1,10 +1,8 @@
 import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const PLAYLIST_ID = '7nC2I08ZK98QLzR3Ov3HvG';
 const CLIENT_ID = process.env.VITE_SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.VITE_SPOTIFY_CLIENT_SECRET;
 
@@ -13,6 +11,42 @@ const JS_FILE = 'main.js';
 
 // Default BRAND image for fallback
 const FALLBACK_IMAGE = 'https://i.scdn.co/image/ab67616d0000b273b7ed663c9b74052ca5a8a183'; // Soulful Start Cover
+
+// ---------------------------------------------------------------------------
+// ARTIST IDs LIST — update this when you change the playlist.
+// WHY HARDCODED: Spotify client_credentials tokens (used in GitHub Actions /
+// Cloudflare builds) cannot access user-owned playlist tracks — the /tracks
+// endpoint returns 403. Scraping the Spotify HTML page also fails in headless
+// CI environments because the page requires JavaScript to render.
+// ---------------------------------------------------------------------------
+const ARTIST_IDS = [
+  '0uAUrmEQbwcDFzg0v7VicO', // Lila Ike
+  '0rskhjcLm5BxjwZDRs4142', // Magixx
+  '16rCzZOMQX7P8Kmn5YKexI', // Mahalia
+  '3ukrG1BmfEiuo0KDj8YTTS', // Teni
+  '6ctMiUYEAd4cy0CaH355Hk', // Yo Maps
+  '26fSO7cYQ1Txtb8xNi8byv', // Chef 187
+  '5Y8PQZPxzdPxPqGxoqKC5H', // Frank Ro
+  '5f24U3gtxTUPIRT2HujkHm', // Xaven
+  '3iBJAU4xa7sV1W9ZJO7uzK', // KB
+  '2rtXAAlmUadQoZk7iXi4Fe', // Triple M
+  '2ApKRJV8pKnEiq10xlTYTJ', // JC Kalinks
+  '44vOrGC9wQuBCQIeBUNc1O', // Tio Nason
+  '4fLTbvnsLjg1PHp1oEiWxl', // Chewe
+  '4Un29hGNtmUOCCGQWiInis', // ESII
+  '1S4KltOEUKNdbOd9RrI5Lg', // Mordecaii
+  '2cm1BTICMJaTYi6OpPchTm', // Rustar
+  '4O9BYjQLNhndddq00X0ALc', // The F.A.K.E
+  '3aufVL9SkQwm5GVFydc1GG', // F Jay
+  '3s9441fVkfNQrHBmXRFMWM', // Kanina Kandalama
+  '1CGpjhbMNattNmUtBaj31Q', // Styve Ace
+  '6T36EOpJj9B6SnyynRqpgG', // Bad Boy Shezy
+  '4OKrofOC9Ypgu1HBxZIMb0', // IamWaters
+  '2Ek5746GXl1ePTgpFBnbct', // Nyarai
+  '4GbzyoLPE0z6jvL5h9st3F', // Vleko
+  '4zefLiC0h0euXegWWgGq3p', // Zaggar
+  '0j5CGslS41MUjK6uekSHZU', // Extra artist
+];
 
 async function getAccessToken() {
     const response = await fetch('https://accounts.spotify.com/api/token', {
@@ -28,60 +62,72 @@ async function getAccessToken() {
 }
 
 async function getArtistBio(artistName) {
-    // 1. Try Wikipedia
+    // 1. Wikipedia — direct title lookup with redirects
     try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(artistName)}&format=json`);
+        const directUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(artistName)}&format=json`;
+        const res = await fetch(directUrl);
         const data = await res.json();
         const pages = data.query?.pages;
         if (pages) {
             const page = Object.values(pages)[0];
-            if (page && page.extract && !page.extract.includes("may refer to:")) {
-                return page.extract.split('\n').filter(p => p.trim() !== '').slice(0, 2).join('\n\n');
+            if (page && page.extract && page.pageid !== -1 &&
+                !page.extract.toLowerCase().includes('may refer to:') &&
+                !page.extract.toLowerCase().includes('disambiguation')) {
+                const paragraphs = page.extract.split('\n').filter(p => p.trim().length > 80);
+                if (paragraphs.length > 0) return paragraphs.slice(0, 2).join('\n\n');
             }
         }
     } catch (e) {
-        console.warn(`⚠️ Failed to fetch Wikipedia bio for ${artistName}`);
+        console.warn(`⚠️ Wikipedia direct lookup failed for ${artistName}`);
     }
 
-    // 2. Fallback to Last.fm
+    // 2. Wikipedia — search fallback (catches stage name variations)
     try {
-        const res = await fetch(`https://www.last.fm/music/${encodeURIComponent(artistName)}/+wiki`);
+        const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(artistName + ' musician singer')}&srlimit=1&format=json`;
+        const sRes = await fetch(searchUrl);
+        const sData = await sRes.json();
+        const hits = sData.query?.search;
+        if (hits && hits.length > 0) {
+            const title = hits[0].title;
+            const pageUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}&format=json`;
+            const pRes = await fetch(pageUrl);
+            const pData = await pRes.json();
+            const pages = pData.query?.pages;
+            if (pages) {
+                const page = Object.values(pages)[0];
+                if (page && page.extract && page.pageid !== -1 &&
+                    !page.extract.toLowerCase().includes('may refer to:') &&
+                    !page.extract.toLowerCase().includes('disambiguation')) {
+                    const paragraphs = page.extract.split('\n').filter(p => p.trim().length > 80);
+                    if (paragraphs.length > 0) return paragraphs.slice(0, 2).join('\n\n');
+                }
+            }
+        }
+    } catch (e) {
+        console.warn(`⚠️ Wikipedia search failed for ${artistName}`);
+    }
+
+    // 3. Last.fm fallback
+    try {
+        const res = await fetch(`https://www.last.fm/music/${encodeURIComponent(artistName)}/+wiki`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TraverceBot/1.0)' }
+        });
         if (res.ok) {
             const html = await res.text();
             const match = html.match(/<div class="wiki-content">([\s\S]*?)<\/div>/);
             if (match) {
                 const text = match[1].replace(/<[^>]+>/g, '').trim();
-                return text.split('\n').filter(p => p.trim() !== '').slice(0, 2).join('\n\n');
+                const paragraphs = text.split('\n').filter(p => p.trim().length > 60);
+                if (paragraphs.length > 0) return paragraphs.slice(0, 2).join('\n\n');
             }
         }
     } catch (e) {
-        console.warn(`⚠️ Failed to fetch Last.fm bio for ${artistName}`);
+        console.warn(`⚠️ Last.fm failed for ${artistName}`);
     }
 
     return '';
 }
 
-async function getPlaylistArtistIds() {
-    console.log('📡 Fetching playlist page to extract artist IDs...');
-    try {
-        const response = await fetch(`https://open.spotify.com/playlist/${PLAYLIST_ID}`);
-        const html = await response.text();
-        
-        const artistRegex = /\/artist\/([a-zA-Z0-9]{22})/g;
-        const ids = new Set();
-        let match;
-        while ((match = artistRegex.exec(html)) !== null) {
-            ids.add(match[1]);
-        }
-        
-        const artistIds = Array.from(ids);
-        console.log(`✅ Found ${artistIds.length} unique artists in playlist.`);
-        return artistIds;
-    } catch (error) {
-        console.error('❌ Error scraping playlist:', error);
-        throw error;
-    }
-}
 
 async function getArtistData(token, id) {
     // Attempt multiple markets if ZM fails or returns empty
@@ -293,11 +339,12 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
 async function sync() {
     console.log('🔄 Starting Automated Artist Sync...');
     
-    // 1. Get Artists from Playlist
-    const artistIds = await getPlaylistArtistIds();
+    // 1. Use hardcoded ARTIST_IDS (Spotify client_credentials cannot access user playlist tracks)
+    const artistIds = ARTIST_IDS.filter(id => id && id.trim().length === 22);
+    console.log(`📋 Syncing ${artistIds.length} artists from hardcoded list.`);
     if (artistIds.length === 0) {
-        console.error('❌ No artists found to sync.');
-        return;
+        console.error('❌ ARTIST_IDS list is empty — add Spotify artist IDs to sync_artists.js');
+        process.exit(1);
     }
 
     // 2. Get Data
