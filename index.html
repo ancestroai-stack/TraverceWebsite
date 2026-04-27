@@ -9,7 +9,10 @@
   <meta property="og:description" content="Discover the artists shaping global underground culture." />
   <meta property="og:type" content="website" />
   <title>Traverce — The New Sound Frontier</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" type="image/png" href="assets/Favicon/favicon.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/Favicon/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/Favicon/icon-512x512.png" />
+  <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,7 +45,7 @@
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <a href="#home"    class="nav-tab active" data-tab="home"    id="tab-home">Home</a>
         <a href="#artist"  class="nav-tab"         data-tab="artist"  id="tab-artist">Artist Profile</a>
-        <a href="#hub"     class="nav-tab"         data-tab="hub"     id="tab-hub">Content Hub</a>
+        <!-- <a href="#hub"     class="nav-tab"         data-tab="hub"     id="tab-hub">Content Hub</a> -->
         <a href="#shop"    class="nav-tab"         data-tab="shop"    id="tab-shop">Shop</a>
         <a href="#about"   class="nav-tab"         data-tab="about"   id="tab-about">About</a>
       </nav>
@@ -64,6 +67,9 @@
       <button class="nav-toggle" id="navToggle" aria-label="Toggle mobile navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
+
+      <!-- Mobile close sits here so it's not clipped by nav-links display:none -->
+      <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close navigation">&#x2715;</button>
     </div>
   </header>
 
@@ -76,7 +82,7 @@
       <!-- HERO -->
       <section class="hero" id="hero" aria-label="Hero">
         <div class="hero-bg">
-          <img src="images/hero.png" alt="Underground artist — Traverce editorial photography" loading="eager" />
+          <img src="assets/change_lighting_colors,_202604271700.jpeg" alt="Traverce Hero — The New Sound Frontier" loading="eager" />
         </div>
         <div class="hero-content container">
           <div class="hero-copy">
@@ -89,7 +95,7 @@
               <span>Your ultimate destination</span>
               <span>for all things music.</span>
             </h1>
-            <p class="hero-subtitle">Discover the artists shaping the Zambian music culture.</p>
+            <h2 class="hero-subtitle">Discover the artists shaping the Zambian music culture.</h2>
             <div class="hero-ctas">
               <a href="#" class="btn-primary" id="hero-explore-btn" data-tab="artist">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -97,7 +103,6 @@
                 </svg>
                 Explore Artists
               </a>
-              <a href="#" class="btn-ghost" id="hero-read-btn" data-tab="hub">Read Features</a>
             </div>
           </div>
         </div>
@@ -107,93 +112,118 @@
         </div>
       </section>
 
-      <!-- Ticker Bar -->
-      <div class="ticker-bar" aria-hidden="true">
-        <div class="ticker-track" id="tickerTrack">
-          <span>Underground Culture</span><span class="ticker-dot">?</span>
-          <span>Traverce Radio</span><span class="ticker-dot">?</span>
-          <span>Artist Spotlights</span><span class="ticker-dot">?</span>
-          <span>New Releases</span><span class="ticker-dot">?</span>
-          <span>Exclusive Sessions</span><span class="ticker-dot">?</span>
-          <span>Underground Culture</span><span class="ticker-dot">?</span>
-          <span>Traverce Radio</span><span class="ticker-dot">?</span>
-          <span>Artist Spotlights</span><span class="ticker-dot">?</span>
-          <span>New Releases</span><span class="ticker-dot">?</span>
-          <span>Exclusive Sessions</span><span class="ticker-dot">?</span>
-        </div>
-      </div>
-      
       <!-- TRENDING NOW + GLOBAL CHARTS -->
       <section class="trending" id="trending" aria-labelledby="trending-title">
 
-        <!-- ▸ Block 1: Trending Now (card strip) -->
-        <div class="tn-block">
+        <!-- ▸ Block 1: Fresh Sonics (Artist Spotlight Grid) -->
+        <div class="fresh-sonics" id="fresh-sonics">
           <div class="container">
-            <div class="tn-header fade-up">
-              <div class="tn-header-left">
-                <div class="tn-eyebrow">Curated Selection</div>
-                <h2 class="tn-title" id="trending-title">Trending Now</h2>
+            <div class="section-header fade-up">
+              <div>
+                <h2 class="section-title">Fresh <span>Sonics</span></h2>
+                <p class="section-subtitle">Sonic excellence, refined. Explore the artists redefining the rotation.</p>
               </div>
-              <a href="#" class="tn-view-all">View All Charts ›</a>
             </div>
 
-            <div class="tn-cards fade-up">
+            <div class="sonics-grid fade-up">
+              <!-- Featured Card -->
+              <div class="sonics-card featured">
+                <div class="sonics-card-img">
+                  <img src="https://i.scdn.co/image/ab67616d0000b273872d5b9eaa14241a354fdf4b" alt="Yo Maps - Vibes on Vibes" loading="lazy" />
+                </div>
+                <div class="sonics-card-info">
+                  <div class="sonics-card-tag">LATEST ALBUM</div>
+                  <div class="sonics-card-name">Vibes on Vibes</div>
+                  <div class="sonics-card-sub">Yo Maps</div>
+                </div>
+              </div>
 
-              <article class="tn-card" id="tn-card-1">
-                <div class="tn-card-img">
-                  <img src="images/editorial2.png" alt="Midnight Sessions — Eera" loading="lazy"/>
-                  <span class="tn-badge hot">Hot</span>
+              <!-- Card 2 -->
+              <div class="sonics-card">
+                <div class="sonics-card-img">
+                  <img src="https://i.scdn.co/image/ab67616d0000b273e108b2bed1eda0b91dfeea4b" alt="Lila Iké" loading="lazy" />
                 </div>
-                <div class="tn-card-info">
-                  <div class="tn-card-name">Midnight Sessions</div>
-                  <div class="tn-card-sub">Eera · Underground Afrobeats</div>
+                <div class="sonics-card-info">
+                  <div class="sonics-card-tag">FEATURED</div>
+                  <div class="sonics-card-name">Treasure Self Love</div>
+                  <div class="sonics-card-sub">Lila Iké</div>
                 </div>
-              </article>
+              </div>
 
-              <article class="tn-card" id="tn-card-2">
-                <div class="tn-card-img">
-                  <img src="images/artist2.png" alt="Urban Echoes — Kaygrö" loading="lazy"/>
-                  <span class="tn-badge trending">Trending</span>
+              <!-- Card 3 -->
+              <div class="sonics-card">
+                <div class="sonics-card-img">
+                  <img src="https://i.scdn.co/image/ab67616d0000b27372db14e7dc7a2e134a0eedd0" alt="Magixx" loading="lazy" />
                 </div>
-                <div class="tn-card-info">
-                  <div class="tn-card-name">Urban Echoes</div>
-                  <div class="tn-card-sub">Kaygrö · Grime · Fusion</div>
+                <div class="sonics-card-info">
+                  <div class="sonics-card-tag">NEW SINGLE</div>
+                  <div class="sonics-card-name">Everyday</div>
+                  <div class="sonics-card-sub">Magixx</div>
                 </div>
-              </article>
+              </div>
 
-              <article class="tn-card" id="tn-card-3">
-                <div class="tn-card-img">
-                  <img src="images/artist3.png" alt="Sonic Landscapes — Amara K" loading="lazy"/>
-                  <span class="tn-badge hot">Hot</span>
+              <!-- Card 4 -->
+              <div class="sonics-card">
+                <div class="sonics-card-img">
+                  <img src="https://i.scdn.co/image/ab67616d0000b273b228c784ed1a054bfbe40670" alt="Xaven" loading="lazy" />
                 </div>
-                <div class="tn-card-info">
-                  <div class="tn-card-name">Sonic Landscapes</div>
-                  <div class="tn-card-sub">Afrobeats / Neo-Soul · Alt</div>
+                <div class="sonics-card-info">
+                  <div class="sonics-card-tag">TRENDING</div>
+                  <div class="sonics-card-name">Donya</div>
+                  <div class="sonics-card-sub">Xaven</div>
                 </div>
-              </article>
+              </div>
 
-              <article class="tn-card" id="tn-card-4">
-                <div class="tn-card-img">
-                  <img src="images/artist4.png" alt="Vocal Essence — Neuríc" loading="lazy"/>
+              <!-- Card 5 -->
+              <div class="sonics-card">
+                <div class="sonics-card-img">
+                  <img src="https://i.scdn.co/image/ab67616d0000b2738750a9a218a4bef99bd90b1f" alt="Chef 187" loading="lazy" />
                 </div>
-                <div class="tn-card-info">
-                  <div class="tn-card-name">Vocal Essence</div>
-                  <div class="tn-card-sub">Neuríc · Electronic</div>
+                <div class="sonics-card-info">
+                  <div class="sonics-card-tag">ESSENTIAL</div>
+                  <div class="sonics-card-name">Broke Nolunkumbwa</div>
+                  <div class="sonics-card-sub">Chef 187</div>
                 </div>
-              </article>
+              </div>
 
             </div>
           </div>
         </div>
 
+
+        <!-- ▸ Block 1.5: Promo Banner (Meet the Collective) -->
+        <div class="promo-banner fade-up">
+          <div class="promo-grid-wrap">
+            <div class="promo-image-wrap">
+              <img src="assets/i_only_want_202604271709.jpeg" alt="Traverce Playlists" class="promo-single-img">
+            </div>
+            <div class="promo-overlay-gradient"></div>
+          </div>
+          <div class="container promo-content-wrap">
+            <div class="promo-text">
+              <h2 class="promo-title">Curated for the Culture —<br>Traverce Playlists</h2>
+              <p class="promo-subtitle">Discover the New Sound Frontier on Spotify</p>
+              <p class="promo-desc">Explore our collection of hand-picked sounds, from deep underground gems to chart-topping anthems. Updated weekly for the visionary listener.</p>
+              <a href="https://open.spotify.com/user/312ernd56qdmvpxacmelspvyuwsq?si=75ef79f381394e34" target="_blank" class="promo-btn">Follow on Spotify</a>
+            </div>
+          </div>
+        </div>
         <!-- ▸ Block 2: Global Charts (split layout) -->
         <div class="gc-block">
           <div class="container gc-inner">
 
             <!-- Left: title + description -->
             <div class="gc-left fade-up">
-              <h2 class="gc-title">Global<br>Charts</h2>
+              <h2 class="gc-title">Zambian<br>Charts</h2>
               <p class="gc-desc">The definitive ranking of influence and artistry. Updated every 24 hours.</p>
+              
+              <div class="gc-spotlight-side">
+                <div class="gc-spotlight-img-wrap">
+                   <img src="https://i.scdn.co/image/ab6761610000e5eb30574ae9b280bf3c228d4260" alt="Number 1 Artist" id="gcSpotlightImg" />
+                   <div class="gc-spotlight-label">No. 1 Artist</div>
+                </div>
+                <div class="gc-spotlight-name">Yo Maps</div>
+              </div>
               <button class="gc-share-btn" id="gcShareBtn">Share Chart</button>
             </div>
 
@@ -207,10 +237,26 @@
         </div>
 
       </section>
+
+      <div class="ticker-bar" aria-hidden="true">
+        <div class="ticker-track" id="tickerTrack">
+          <span>Underground Culture</span><span class="ticker-dot">?</span>
+          <span>Traverce Radio</span><span class="ticker-dot">?</span>
+          <span>Artist Spotlights</span><span class="ticker-dot">?</span>
+          <span>New Releases</span><span class="ticker-dot">?</span>
+          <span>Exclusive Sessions</span><span class="ticker-dot">?</span>
+          <span>Underground Culture</span><span class="ticker-dot">?</span>
+          <span>Traverce Radio</span><span class="ticker-dot">?</span>
+          <span>Artist Spotlights</span><span class="ticker-dot">?</span>
+          <span>New Releases</span><span class="ticker-dot">?</span>
+          <span>Exclusive Sessions</span><span class="ticker-dot">?</span>
+        </div>
+
+        
+      </div>
 <!-- Page Home ends here, transitioning to separate views -->
     </main>
   </div>
-
 
   <!-- ═══════════════════════════════════════════
        PAGE: ARTIST PROFILE
@@ -606,7 +652,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/0uAUrmEQbwcDFzg0v7VicO?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/0uAUrmEQbwcDFzg0v7VicO?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -730,7 +776,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/0rskhjcLm5BxjwZDRs4142?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/0rskhjcLm5BxjwZDRs4142?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -854,7 +900,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/16rCzZOMQX7P8Kmn5YKexI?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/16rCzZOMQX7P8Kmn5YKexI?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -978,7 +1024,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/3ukrG1BmfEiuo0KDj8YTTS?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/3ukrG1BmfEiuo0KDj8YTTS?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1102,7 +1148,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/6ctMiUYEAd4cy0CaH355Hk?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/6ctMiUYEAd4cy0CaH355Hk?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1226,7 +1272,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/26fSO7cYQ1Txtb8xNi8byv?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/26fSO7cYQ1Txtb8xNi8byv?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1350,7 +1396,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/5Y8PQZPxzdPxPqGxoqKC5H?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/5Y8PQZPxzdPxPqGxoqKC5H?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1474,7 +1520,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/5f24U3gtxTUPIRT2HujkHm?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/5f24U3gtxTUPIRT2HujkHm?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1598,7 +1644,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/3iBJAU4xa7sV1W9ZJO7uzK?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/3iBJAU4xa7sV1W9ZJO7uzK?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1723,7 +1769,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/2rtXAAlmUadQoZk7iXi4Fe?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/2rtXAAlmUadQoZk7iXi4Fe?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1847,7 +1893,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/2ApKRJV8pKnEiq10xlTYTJ?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/2ApKRJV8pKnEiq10xlTYTJ?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -1958,7 +2004,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/44vOrGC9wQuBCQIeBUNc1O?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/44vOrGC9wQuBCQIeBUNc1O?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2082,7 +2128,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/4fLTbvnsLjg1PHp1oEiWxl?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/4fLTbvnsLjg1PHp1oEiWxl?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2200,7 +2246,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/4Un29hGNtmUOCCGQWiInis?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/4Un29hGNtmUOCCGQWiInis?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2324,7 +2370,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/0j5CGslS41MUjK6uekSHZU?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/0j5CGslS41MUjK6uekSHZU?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2448,7 +2494,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/1S4KltOEUKNdbOd9RrI5Lg?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/1S4KltOEUKNdbOd9RrI5Lg?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2559,7 +2605,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/2cm1BTICMJaTYi6OpPchTm?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/2cm1BTICMJaTYi6OpPchTm?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2671,7 +2717,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/4O9BYjQLNhndddq00X0ALc?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/4O9BYjQLNhndddq00X0ALc?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2795,7 +2841,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/3aufVL9SkQwm5GVFydc1GG?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/3aufVL9SkQwm5GVFydc1GG?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -2919,7 +2965,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/3s9441fVkfNQrHBmXRFMWM?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/3s9441fVkfNQrHBmXRFMWM?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3030,7 +3076,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/1CGpjhbMNattNmUtBaj31Q?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/1CGpjhbMNattNmUtBaj31Q?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3141,7 +3187,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/6T36EOpJj9B6SnyynRqpgG?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/6T36EOpJj9B6SnyynRqpgG?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3246,7 +3292,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/4OKrofOC9Ypgu1HBxZIMb0?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/4OKrofOC9Ypgu1HBxZIMb0?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3333,7 +3379,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/2Ek5746GXl1ePTgpFBnbct?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/2Ek5746GXl1ePTgpFBnbct?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3426,7 +3472,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/4GbzyoLPE0z6jvL5h9st3F?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/4GbzyoLPE0z6jvL5h9st3F?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3532,7 +3578,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/4zefLiC0h0euXegWWgGq3p?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/4zefLiC0h0euXegWWgGq3p?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3651,7 +3697,7 @@
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/0j5CGslS41MUjK6uekSHZU?utm_source=generator" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe data-testid="embed-iframe" style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/0j5CGslS41MUjK6uekSHZU?utm_source=generator" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -3710,7 +3756,7 @@
   <!-- ═══════════════════════════════════════════
        PAGE: CONTENT HUB
   ════════════════════════════════════════════════ -->
-  <div class="page-view" id="page-hub">
+  <div class="page-view" id="page-hub" style="display: none;">
 
     <!-- Hub Hero -->
     <section class="hub-hero" aria-label="Content Hub Hero">
@@ -4119,7 +4165,7 @@
           <ul>
             <li><a href="#home" data-tab="home">Home</a></li>
             <li><a href="#artist" data-tab="artist">Artist Profile</a></li>
-            <li><a href="#hub" data-tab="hub">Content Hub</a></li>
+            <!-- <li><a href="#hub" data-tab="hub">Content Hub</a></li> -->
             <li><a href="#shop" data-tab="shop">Shop</a></li>
             <li><a href="#about" data-tab="about">About Us</a></li>
           </ul>
@@ -4134,6 +4180,20 @@
         </div>
       </div>
       <div class="footer-bottom">
+        <div class="footer-socials-row">
+          <a href="https://www.instagram.com/travercent/" target="_blank" rel="noopener" class="footer-social-icon" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://www.facebook.com/Traverceent" target="_blank" class="footer-social-icon" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          </a>
+          <a href="https://www.tiktok.com/@travercent" target="_blank" rel="noopener" class="footer-social-icon" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+          </a>
+          <a href="https://www.youtube.com/@Travercent" target="_blank" rel="noopener" class="footer-social-icon" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+          </a>
+        </div>
         <p>&copy; 2026 Traverce. Culture is practice.</p>
       </div>
     </div>
@@ -4148,7 +4208,7 @@
       <header class="report-header">
         <div class="report-brand">Traverce</div>
         <div class="report-title-wrap">
-          <h1 class="report-title">Global Charts</h1>
+          <h1 class="report-title">Zambian Charts</h1>
           <p class="report-date" id="reportDate">OCTOBER 2024</p>
         </div>
       </header>
@@ -4170,7 +4230,7 @@
   <div class="share-modal-overlay" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
     <div class="share-modal-content">
       <button class="share-modal-close" id="shareClose" aria-label="Close share dialog">✕</button>
-      <h3 class="share-modal-title" id="shareModalTitle">Share Global Charts</h3>
+      <h3 class="share-modal-title" id="shareModalTitle">Share Zambian Charts</h3>
       <p class="share-modal-desc">Select a platform to share the latest charts</p>
       
       <div class="share-options">

@@ -48,7 +48,35 @@ const ARTIST_IDS = [
   '0j5CGslS41MUjK6uekSHZU', // Extra artist
 ];
 
+const PLAYLIST_ID = '7nC2I08ZK98QLzR3Ov3HvG';
+const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
+
+// Gets an access token. If SPOTIFY_REFRESH_TOKEN is set (GitHub Secret),
+// uses the user OAuth token which CAN read playlist tracks.
+// Otherwise falls back to client_credentials (can only read artist data).
 async function getAccessToken() {
+    if (REFRESH_TOKEN) {
+        // User token via refresh — can read playlist tracks
+        const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: REFRESH_TOKEN
+            })
+        });
+        const data = await response.json();
+        if (data.access_token) {
+            console.log('🔑 Using user OAuth token (playlist-read enabled).');
+            return { token: data.access_token, canReadPlaylist: true };
+        }
+        console.warn('⚠️ Refresh token failed, falling back to client_credentials.');
+    }
+
+    // Client credentials fallback — cannot read user playlist tracks
     const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
@@ -58,8 +86,46 @@ async function getAccessToken() {
         body: 'grant_type=client_credentials'
     });
     const data = await response.json();
-    return data.access_token;
+    console.log('🔑 Using client_credentials token (hardcoded artist list only).');
+    return { token: data.access_token, canReadPlaylist: false };
 }
+
+// Reads all artist IDs directly from the Spotify playlist via the API.
+// Only works when called with a user OAuth token (refresh token configured).
+async function getPlaylistArtistIdsFromAPI(token) {
+    console.log('📡 Reading artists from Spotify playlist via API...');
+    const artistIds = new Set();
+
+    // First page is embedded in the playlist object
+    let url = `https://api.spotify.com/v1/playlists/${PLAYLIST_ID}`;
+    const firstRes = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+    const playlist = await firstRes.json();
+
+    if (!playlist.tracks) {
+        throw new Error('Playlist tracks unavailable — token may lack playlist-read scope.');
+    }
+
+    (playlist.tracks.items || []).forEach(item => {
+        item.track?.artists?.forEach(a => a.id && artistIds.add(a.id));
+    });
+
+    // Paginate through remaining pages
+    let nextUrl = playlist.tracks.next;
+    while (nextUrl) {
+        const res = await fetch(nextUrl, { headers: { 'Authorization': 'Bearer ' + token } });
+        const page = await res.json();
+        if (!page.items) break;
+        page.items.forEach(item => {
+            item.track?.artists?.forEach(a => a.id && artistIds.add(a.id));
+        });
+        nextUrl = page.next;
+    }
+
+    console.log(`✅ Found ${artistIds.size} unique artists in playlist.`);
+    return [...artistIds];
+}
+
+
 
 async function getArtistBio(artistName) {
     // 1. Wikipedia — direct title lookup with redirects

@@ -14,67 +14,62 @@ import * as htmlToImage from 'html-to-image';
   // We've hardcoded your "Traverce Top 10" playlist here to keep the site fast and static.
   async function fetchSpotifyCharts() {
     return [
-      {
-        rank: '01',
-        name: 'I Choose You',
-        artist: 'Dizmo, Kupa Kontra',
-        year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b273794a375f3b0d909c03f1fe34', // Dizmo cover
-        spotifyTrackId: '1DQ38R7QYabDg9h9xqwIsy',
-        trackUrl: 'https://open.spotify.com/track/1DQ38R7QYabDg9h9xqwIsy',
-        previewUrl: null,
-        plays: 'NEW',
-        trend: 'new'
-      },
-      {
-        rank: '02',
-        name: 'Waistline',
-        artist: 'Jay Rox',
-        year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b273d2c93bda9f36088da9aa260b', // Jay Rox cover
-        spotifyTrackId: '57j0tjcMAuSxwXHUhCG7OK',
-        trackUrl: 'https://open.spotify.com/track/57j0tjcMAuSxwXHUhCG7OK',
-        previewUrl: null,
-        plays: '4:32',
-        trend: 'up'
-      },
-      {
-        rank: '03',
-        name: 'Kale Bwangu',
-        artist: 'T-Low, G-FIVE, Chef 187',
-        year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b2739f2055d4ac1d384feefa46bd', // Kale Bwangu cover
-        spotifyTrackId: '6xL5AnX3Ru4QhexzjEjStT',
-        trackUrl: 'https://open.spotify.com/track/6xL5AnX3Ru4QhexzjEjStT',
-        previewUrl: null,
-        plays: '3:15',
-        trend: 'flat'
-      },
-      {
-        rank: '04',
-        name: 'Jahman Juice',
-        artist: 'Slapdee, 76 Drums',
-        year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b273ab2c4c9426e3f64479480cee', // Jahman Juice cover
-        spotifyTrackId: '6KpCKlNrHyXewT7BNcJZzA',
-        trackUrl: 'https://open.spotify.com/track/6KpCKlNrHyXewT7BNcJZzA',
-        previewUrl: null,
-        plays: '5:10',
-        trend: 'down'
-      },
-      {
-        rank: '05',
-        name: 'So Mone',
-        artist: 'Yo Maps, Tay Grin',
-        year: 2024,
-        image: 'https://i.scdn.co/image/ab67616d0000b27301be3547f7e9c7a6022a7759', // So Mone cover
-        spotifyTrackId: '0Azf3U8BVU8rv2pSCnjSoB',
-        trackUrl: 'https://open.spotify.com/track/0Azf3U8BVU8rv2pSCnjSoB',
-        previewUrl: null,
-        plays: '3:58',
-        trend: 'up'
-      }
-    ];
+        {
+          "rank": "01",
+          "name": "Budget",
+          "artist": "Yo Maps, Frank Ro, Dizmo, KingTec",
+          "image": "https://i.scdn.co/image/ab67616d0000b2731228a8f88ba91b3f6646928b",
+          "year": 2026,
+          "previewUrl": "",
+          "plays": "NEW",
+          "trend": "new",
+          "artistImage": "https://i.scdn.co/image/ab6761610000e5eb30574ae9b280bf3c228d4260"
+        },
+        {
+          "rank": "02",
+          "name": "Streams & Shazam Numbers",
+          "artist": "Jae Cash",
+          "image": "https://i.scdn.co/image/ab67616d0000b2734fff9dd3f6e2fed7b2bd8f77",
+          "year": 2025,
+          "previewUrl": "",
+          "plays": "NEW",
+          "trend": "new",
+          "artistImage": "https://i.scdn.co/image/ab6761610000e5eb73ed5a4fd12b6c8f3d6df44f"
+        },
+        {
+          "rank": "03",
+          "name": "Weka",
+          "artist": "Bomb$hell Grenade, Yo Maps",
+          "image": "https://i.scdn.co/image/ab67616d0000b273a53c463745e85be8544cf308",
+          "year": 2026,
+          "previewUrl": "",
+          "plays": "NEW",
+          "trend": "new",
+          "artistImage": "https://i.scdn.co/image/ab6761610000e5ebbe366637d910b4ee9d7ecdec"
+        },
+        {
+          "rank": "04",
+          "name": "Chingelengele (feat. Chile One)",
+          "artist": "Drimz Mr Muziq, Chile One",
+          "image": "https://i.scdn.co/image/ab67616d0000b273dfbb9b0e5fa9654667db354c",
+          "year": 2026,
+          "previewUrl": "",
+          "plays": "NEW",
+          "trend": "new",
+          "artistImage": "https://i.scdn.co/image/ab6761610000e5eb7d2980092e059cf0f237d1aa"
+        },
+        {
+          "rank": "05",
+          "name": "Dzaddy",
+          "artist": "Ndine Emma, Shokki Mwana Chibolya, Kayz Adams, Mwaka Hal",
+          "image": "https://i.scdn.co/image/ab67616d0000b2734901a6c044e7094e053a6caa",
+          "year": 2025,
+          "previewUrl": "",
+          "plays": "NEW",
+          "trend": "new",
+          "artistImage": "https://i.scdn.co/image/ab6761610000e5ebe77cea2ecae791df1b739392"
+        }
+      ];
   }
 
   function openSpotifyPlayer(track) {
@@ -142,7 +137,7 @@ import * as htmlToImage from 'html-to-image';
           <div class="gc-track-sub">${track.artist} · ${track.year}</div>
         </div>
         <div class="gc-meta">
-          <div class="gc-trend gc-new">${track.trend.toUpperCase()}</div>
+          <div class="gc-trend gc-${track.trend}"></div>
           <div class="gc-plays">${track.plays}</div>
           <button class="gc-play-btn" type="button" aria-label="Play ${track.name}">
             <span class="gc-play-icon">▶</span>
@@ -164,6 +159,15 @@ import * as htmlToImage from 'html-to-image';
     });
 
     // Re-init fade-ups for new elements
+    // Update Spotlight Artist (Number 1)
+    const spotlightImg = document.getElementById('gcSpotlightImg');
+    const spotlightName = document.querySelector('.gc-spotlight-name');
+    if (tracks.length > 0 && spotlightImg && spotlightName) {
+      const topTrack = tracks[0];
+      spotlightImg.src = topTrack.artistImage || topTrack.image;
+      spotlightName.textContent = topTrack.artist.split(',')[0];
+    }
+
     initFadeUps(document.getElementById('page-home'));
   }
 
@@ -201,6 +205,14 @@ import * as htmlToImage from 'html-to-image';
       p.classList.remove('active', 'fade-in');
     });
 
+    // ── Lazy Spotify iframes: unload all embeds on page leave ──
+    document.querySelectorAll('iframe[data-src]').forEach(iframe => {
+      if (iframe.src && iframe.src !== 'about:blank') {
+        iframe.dataset.src = iframe.src;
+        iframe.removeAttribute('src');
+      }
+    });
+
     // Activate target tab
     const activeTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
     if (activeTab) activeTab.classList.add('active');
@@ -215,6 +227,13 @@ import * as htmlToImage from 'html-to-image';
         });
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // ── Lazy Spotify iframes: load only the embed on the active page ──
+      targetPage.querySelectorAll('iframe[data-src]').forEach(iframe => {
+        if (!iframe.src || iframe.src === 'about:blank') {
+          iframe.src = iframe.dataset.src;
+        }
+      });
     }
 
     // Re-init fade-up animations for the new page
@@ -278,7 +297,7 @@ import * as htmlToImage from 'html-to-image';
       /* ARTIST_TABS_START */
       'lila-ik-', 'magixx', 'mahalia', 'teni', 'yo-maps', 'chef-187', 'frank-ro', 'xaven', 'kb', 'triple-m', 'jc-kalinks', 'tio-nason', 'chewe', 'esii', 'mag44', 'mordecaii', 'rustar', 'the-f-a-k-e', 'f-jay', 'kanina-kandalama', 'styve-ace', 'bad-boy-shezy', 'iamwaters', 'nyarai', 'vleko', 'zaggar',
       /* ARTIST_TABS_END */
-      'hub', 'shop'].includes(hash) ? hash : 'home';
+      'hub', 'shop', 'about'].includes(hash) ? hash : 'home';
   }
 
   // Init on load
@@ -303,6 +322,16 @@ import * as htmlToImage from 'html-to-image';
       const isOpen = nav.classList.toggle('mobile-open');
       navToggle.setAttribute('aria-expanded', isOpen.toString());
       document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+  }
+
+  /* Mobile nav close button */
+  const mobileNavClose = document.getElementById('mobileNavClose');
+  if (mobileNavClose) {
+    mobileNavClose.addEventListener('click', () => {
+      nav.classList.remove('mobile-open');
+      navToggle && navToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
     });
   }
 
@@ -351,25 +380,7 @@ import * as htmlToImage from 'html-to-image';
     fadeEls.forEach(el => observer.observe(el));
   }
 
-  /* ── SONICS CARD TILT ───────────────────────────────────────── */
-  document.querySelectorAll('.sonics-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(600px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) translateY(-3px)`;
-    });
-    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-  });
-
-  /* ── STORY CARD HOVER LIFT ──────────────────────────────────── */
-  document.querySelectorAll('.story-card').forEach(card => {
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'translateY(-4px)';
-      card.style.transition = 'transform 220ms cubic-bezier(0.16,1,0.3,1)';
-    });
-    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-  });
+  /* ── HOVER EFFECTS REMOVED ── */
 
   /* ── RADIO TRACK ROTATION ───────────────────────────────────── */
   const tracks = [
@@ -699,5 +710,3 @@ import * as htmlToImage from 'html-to-image';
   }
 
 })();
-
-
