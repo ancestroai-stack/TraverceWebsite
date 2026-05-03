@@ -73,14 +73,75 @@
     </div>
   </header>
 
+  <div class="cart-overlay" id="cartOverlay" aria-hidden="true"></div>
+  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <div class="cart-drawer-header">
+      <div>
+        <p class="cart-kicker">Traverce Store</p>
+        <h2 class="cart-title" id="cartTitle">Your Cart</h2>
+      </div>
+      <button class="cart-close" id="cartClose" aria-label="Close cart">&times;</button>
+    </div>
+
+    <div class="cart-empty" id="cartEmpty">
+      <p>Your cart is empty.</p>
+      <button class="btn-primary" type="button" id="cartEmptyShop">Shop Products</button>
+    </div>
+
+    <div class="cart-content" id="cartContent">
+      <div class="cart-items" id="cartItems" aria-live="polite"></div>
+
+      <div class="cart-summary">
+        <div class="cart-row"><span>Subtotal</span><strong id="cartSubtotal">K0.00</strong></div>
+        <div class="cart-row"><span>Delivery</span><strong id="cartDelivery">K0.00</strong></div>
+        <div class="cart-row cart-total"><span>Total</span><strong id="cartTotal">K0.00</strong></div>
+      </div>
+
+      <form class="checkout-form" id="checkoutForm">
+        <h3>Checkout Details</h3>
+        <div class="checkout-grid">
+          <label>
+            Full name
+            <input type="text" id="checkoutName" autocomplete="name" required>
+          </label>
+          <label>
+            Email
+            <input type="email" id="checkoutEmail" autocomplete="email" required>
+          </label>
+          <label>
+            Phone
+            <input type="tel" id="checkoutPhone" autocomplete="tel" required>
+          </label>
+          <label>
+            City
+            <input type="text" id="checkoutCity" autocomplete="address-level2" required>
+          </label>
+        </div>
+        <label>
+          Delivery address
+          <textarea id="checkoutAddress" rows="3" autocomplete="street-address" required></textarea>
+        </label>
+        <button class="checkout-submit" type="submit">Place Order</button>
+        <p class="checkout-note">This creates an order request. Payment is confirmed after availability and delivery details are reviewed.</p>
+      </form>
+    </div>
+
+    <div class="order-confirmation" id="orderConfirmation" hidden>
+      <p class="cart-kicker">Order Received</p>
+      <h3 id="orderNumber">Order #TRV-0000</h3>
+      <p>We have saved your order request. A Traverce store assistant will confirm payment and delivery details.</p>
+      <button class="btn-primary" type="button" id="orderDone">Done</button>
+    </div>
+  </aside>
+
   <!-- ═══════════════════════════════════════════
        PAGE: HOME
   ════════════════════════════════════════════════ -->
-  <div class="page-view active" id="page-home">
+  <div class="page-view active fade-in" id="page-home">
     <main>
 
       <!-- HERO -->
-      <section class="hero" id="hero" aria-label="Hero">
+      <section class="hero loaded" id="hero" aria-label="Hero">
         <div class="hero-bg">
           <img src="assets/change_lighting_colors,_202604271700.jpeg" alt="Traverce Hero — The New Sound Frontier" loading="eager" />
         </div>
@@ -3931,9 +3992,13 @@
     <!-- Shop Hero / Drop Banner -->
     <section class="shop-hero" aria-label="Exclusive Drop Banner">
       <div class="shop-hero-bg">
-        <img src="images/story2.png" alt="Exclusive Drop" loading="eager"/>
+        <img src="assets/shop cover.jpg" alt="Exclusive Drop" loading="eager"/>
       </div>
       <div class="shop-hero-overlay"></div>
+      <div class="shop-cover-caption">
+        <span>Traverce Shop</span>
+        <p>Limited music goods, apparel, vinyl, and artist-led collectibles curated for the new sound frontier.</p>
+      </div>
       <div class="shop-hero-content container">
         <div class="drop-eyebrow">
           <span class="drop-badge">Limited Drop</span>
@@ -3954,6 +4019,46 @@
 
     <main class="shop-main container" id="shop-products">
 
+      <!-- Featured Collections Section -->
+      <section class="shop-featured-section fade-up">
+        <div class="collection-header">
+          <h2 class="collection-title">Our <span class="t-accent">Collections</span></h2>
+          <p class="collection-subtitle">Curated drops from the artists & producers shaping the sound frontier</p>
+        </div>
+
+        <div class="featured-collections">
+          <!-- Vinyl Collection -->
+          <article class="featured-collection-card collection-vinyl">
+            <img src="https://images.unsplash.com/photo-1575488005954-3a287695b242?auto=format&fit=crop&w=1200&q=80" alt="Vinyl records displayed in a record shop" loading="lazy" />
+            <div class="featured-collection-overlay">
+              <h3 class="featured-collection-name">Vinyl</h3>
+              <p class="featured-collection-desc">Limited edition pressings from emerging producers</p>
+              <button class="featured-collection-btn" data-shopcat="vinyl">Shop Vinyl</button>
+            </div>
+          </article>
+
+          <!-- Apparel Collection -->
+          <article class="featured-collection-card collection-apparel">
+            <img src="assets/remove_the_chains_on_neck_202605031609.jpeg" alt="Traverce apparel preview" loading="lazy" />
+            <div class="featured-collection-overlay">
+              <h3 class="featured-collection-name">Apparel</h3>
+              <p class="featured-collection-desc">Exclusive drops & artist collaborations</p>
+              <button class="featured-collection-btn" data-shopcat="apparel">Shop Apparel</button>
+            </div>
+          </article>
+
+          <!-- Prints & Merch Collection -->
+          <article class="featured-collection-card collection-prints">
+            <img src="https://images.unsplash.com/photo-1658129208199-9541d7c39ac0?auto=format&fit=crop&w=1200&q=80" alt="Graphic poster artwork on a wall" loading="lazy" />
+            <div class="featured-collection-overlay">
+              <h3 class="featured-collection-name">Prints</h3>
+              <p class="featured-collection-desc">Signed artwork & collectible editions</p>
+              <button class="featured-collection-btn" data-shopcat="prints">Shop Prints</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- Category Pills -->
       <div class="shop-cats fade-up" role="tablist" aria-label="Product categories">
         <button class="shop-cat active" data-shopcat="all" id="shopcat-all" role="tab">All Products</button>
@@ -3967,96 +4072,96 @@
       <div class="shop-grid">
 
         <article class="product-card fade-up" data-shopcat="vinyl" id="product-1">
-          <div class="product-img">
-            <img src="images/album1.png" alt="Hollow Frequencies Vinyl" loading="lazy"/>
+          <div class="product-img product-art product-art-vinyl">
+            <img src="https://images.unsplash.com/photo-1558114073-fd334d98bbc5?auto=format&fit=crop&w=1200&q=80" alt="Black vinyl record playing on a record player" loading="lazy"/>
             <div class="product-badge new">New Drop</div>
             <div class="product-overlay">
-              <button class="product-add-btn" data-product="Hollow Frequencies Vinyl" data-price="38">Add to Cart</button>
+              <button class="product-add-btn" data-product="Hollow Frequencies Vinyl" data-price="950">Add to Cart</button>
             </div>
           </div>
           <div class="product-info">
             <div class="product-cat">Vinyl</div>
             <div class="product-name">Hollow Frequencies — Ltd. Vinyl</div>
             <div class="product-artist">Eera</div>
-            <div class="product-price">£38.00</div>
+            <div class="product-price">K950.00</div>
           </div>
         </article>
 
         <article class="product-card fade-up" data-shopcat="apparel" id="product-2">
-          <div class="product-img">
-            <img src="images/editorial1.png" alt="Traverce Signature Tee" loading="lazy"/>
+          <div class="product-img product-art product-art-tee">
+            <img src="assets/remove_the_chains_on_neck_202605031609.jpeg" alt="Traverce Signature Tee apparel preview" loading="lazy"/>
             <div class="product-badge limited">Limited</div>
             <div class="product-overlay">
-              <button class="product-add-btn" data-product="Traverce Signature Tee" data-price="45">Add to Cart</button>
+              <button class="product-add-btn" data-product="Traverce Signature Tee" data-price="1125">Add to Cart</button>
             </div>
           </div>
           <div class="product-info">
             <div class="product-cat">Apparel</div>
             <div class="product-name">Traverce Signature Tee</div>
             <div class="product-artist">Traverce Merch</div>
-            <div class="product-price">£45.00</div>
+            <div class="product-price">K1,125.00</div>
           </div>
         </article>
 
         <article class="product-card fade-up" data-shopcat="vinyl" id="product-3">
-          <div class="product-img">
-            <img src="images/album2.png" alt="Pulse Lines Vinyl" loading="lazy"/>
+          <div class="product-img product-art product-art-pulse">
+            <img src="https://images.unsplash.com/photo-1575488005954-3a287695b242?auto=format&fit=crop&w=1200&q=80" alt="Rows of collectible vinyl records in a record shop" loading="lazy"/>
             <div class="product-overlay">
-              <button class="product-add-btn" data-product="Pulse Lines Vinyl" data-price="32">Add to Cart</button>
+              <button class="product-add-btn" data-product="Pulse Lines Vinyl" data-price="800">Add to Cart</button>
             </div>
           </div>
           <div class="product-info">
             <div class="product-cat">Vinyl</div>
             <div class="product-name">Pulse Lines — Coloured Vinyl</div>
             <div class="product-artist">Solène</div>
-            <div class="product-price">£32.00</div>
+            <div class="product-price">K800.00</div>
           </div>
         </article>
 
         <article class="product-card fade-up" data-shopcat="prints" id="product-4">
-          <div class="product-img">
-            <img src="images/editorial2.png" alt="Eera Studio Print" loading="lazy"/>
+          <div class="product-img product-art product-art-print">
+            <img src="https://images.unsplash.com/photo-1658129208199-9541d7c39ac0?auto=format&fit=crop&w=1200&q=80" alt="Bold graphic poster artwork suitable for a signed print" loading="lazy"/>
             <div class="product-badge exclusive">Exclusive</div>
             <div class="product-overlay">
-              <button class="product-add-btn" data-product="Eera Studio Print" data-price="75">Add to Cart</button>
+              <button class="product-add-btn" data-product="Eera Studio Print" data-price="1875">Add to Cart</button>
             </div>
           </div>
           <div class="product-info">
             <div class="product-cat">Print</div>
             <div class="product-name">Eera — Signed Studio Print</div>
             <div class="product-artist">Eera × Traverce</div>
-            <div class="product-price">£75.00</div>
+            <div class="product-price">K1,875.00</div>
           </div>
         </article>
 
         <article class="product-card fade-up" data-shopcat="apparel" id="product-5">
-          <div class="product-img">
-            <img src="images/story2.png" alt="Neuric Hoodie" loading="lazy"/>
+          <div class="product-img product-art product-art-hoodie">
+            <img src="https://images.unsplash.com/photo-1650594122465-7608fcd64620?auto=format&fit=crop&w=1200&q=80" alt="Person wearing a black hoodie" loading="lazy"/>
             <div class="product-overlay">
-              <button class="product-add-btn" data-product="Neuric Hoodie" data-price="65">Add to Cart</button>
+              <button class="product-add-btn" data-product="Neuric Hoodie" data-price="1625">Add to Cart</button>
             </div>
           </div>
           <div class="product-info">
             <div class="product-cat">Apparel</div>
             <div class="product-name">Neuríc "Experimental" Hoodie</div>
             <div class="product-artist">Neuríc × Traverce</div>
-            <div class="product-price">£65.00</div>
+            <div class="product-price">K1,625.00</div>
           </div>
         </article>
 
         <article class="product-card fade-up" data-shopcat="bundles" id="product-6">
-          <div class="product-img">
-            <img src="images/story1.png" alt="Traverce Bundle" loading="lazy"/>
+          <div class="product-img product-art product-art-bundle">
+            <img src="https://images.unsplash.com/photo-1637904731042-2ef367b8c00c?auto=format&fit=crop&w=1200&q=80" alt="Merchandise gift box with apparel items" loading="lazy"/>
             <div class="product-badge bundle">Best Value</div>
             <div class="product-overlay">
-              <button class="product-add-btn" data-product="Ultimate Fan Bundle" data-price="120">Add to Cart</button>
+              <button class="product-add-btn" data-product="Ultimate Fan Bundle" data-price="3000">Add to Cart</button>
             </div>
           </div>
           <div class="product-info">
             <div class="product-cat">Bundle</div>
             <div class="product-name">Ultimate Fan Bundle</div>
             <div class="product-artist">Vinyl + Tee + Print</div>
-            <div class="product-price">£120.00 <span class="product-was">£158.00</span></div>
+            <div class="product-price">K3,000.00 <span class="product-was">K3,950.00</span></div>
           </div>
         </article>
 
@@ -4068,83 +4173,61 @@
        PAGE: ABOUT
   ════════════════════════════════════════════════ -->
   <div class="page-view" id="page-about">
-    <section class="about-hero fade-up">
+    <section class="about-hero about-hero-text fade-up">
       <div class="container">
         <div class="hero-eyebrow">
           <div class="hero-eyebrow-line"></div>
-          <span class="hero-eyebrow-text">The Traverce Narrative</span>
+          <span class="hero-eyebrow-text">About Traverce</span>
         </div>
-        <h1 class="about-hero-title">Crafting the<br>future of <em>Sound</em></h1>
-        <p class="about-hero-subtitle">We are a platform, taste company, and distillery of cultural editorial excellence.</p>
-      </div>
-      <div class="about-hero-bg"></div>
-    </section>
-
-    <!-- MISSION BANNER (Yellow) -->
-    <section class="radio-banner" id="about-mission">
-      <div class="container about-banner-inner">
-        <h2 class="about-us-title">About Us</h2>
+        <h1 class="about-hero-title">A home for the<br>new sound frontier.</h1>
+        <p class="about-hero-subtitle">Traverce is a music and culture platform built to help listeners discover artists, stories, releases, and movements shaping contemporary sound.</p>
       </div>
     </section>
 
-    <!-- BRAND PILLARS -->
-    <section class="pillars" id="about-pillars">
-      <div class="pillar-row fade-up" id="pillar-about">
-        <div class="pillar-text">
-          <div class="pillar-label">Our Philosophy</div>
-          <h2 class="pillar-title">We are a curation,<br>taste &amp; culture company.</h2>
-          <p class="pillar-body">Traverce aims to be a tool for discovering, crafting, and amplifying boundary-pushing music. We find our focus on discovery artists with one unwavering conviction: extraordinary underground sounds should be heard. Unapologetically championing the new sound frontier.</p>
-        </div>
-        <div class="pillar-icon-wrap">
-          <div class="pillar-icon-frame">
-            <svg class="pillar-svg" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="10" y="10" width="200" height="180" rx="8" fill="#1a1208" stroke="#FFD042" stroke-width="2"/>
-              <rect x="20" y="20" width="180" height="140" rx="4" fill="#0d0b05" stroke="#5a4a20" stroke-width="1"/>
-              <path d="M 30 140 A 80 80 0 0 1 190 140" fill="none" stroke="#333" stroke-width="1.5"/>
-              <line x1="110" y1="74" x2="110" y2="82" stroke="#FFD042" stroke-width="1.5"/>
-              <path d="M 30 140 A 80 80 0 0 1 95 84" fill="none" stroke="#4ade80" stroke-width="4" opacity="0.6"/>
-              <path d="M 95 84 A 80 80 0 0 1 155 84" fill="none" stroke="#FFD042" stroke-width="4" opacity="0.6"/>
-              <path d="M 155 84 A 80 80 0 0 1 190 140" fill="none" stroke="#f87171" stroke-width="4" opacity="0.6"/>
-              <line x1="110" y1="140" x2="68" y2="92" stroke="#FFD042" stroke-width="2.5" stroke-linecap="round" class="vu-needle"/>
-              <circle cx="110" cy="140" r="5" fill="#FFD042"/>
-              <text x="110" y="175" fill="#FFD042" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">VU</text>
-            </svg>
-          </div>
+    <section class="about-statement" id="about-mission">
+      <div class="container about-statement-grid">
+        <div class="about-statement-kicker">What we are</div>
+        <div class="about-statement-copy">
+          <p>We are a discovery company for music culture. Our work is focused on finding promising talent, giving context to the scenes they come from, and making it easier for audiences to connect with music that deserves attention.</p>
+          <p>Traverce exists for people who care about what is next: listeners, artists, writers, curators, and brands looking for honest cultural signal instead of noise.</p>
         </div>
       </div>
+    </section>
 
-      <div class="pillar-row reverse fade-up" id="pillar-discovery">
-        <div class="pillar-icon-wrap">
-          <div class="pillar-icon-frame">
-            <svg class="pillar-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="110" cy="110" r="100" fill="#1a1208" stroke="#FFD042" stroke-width="2"/>
-              <circle cx="110" cy="110" r="48" fill="#1a1208"/>
-              <text x="110" y="100" fill="#FFD042" font-size="7" font-family="monospace" text-anchor="middle" font-weight="bold">TRAVERCE</text>
-              <circle cx="110" cy="110" r="5" fill="#0a0a0a" stroke="#FFD042" stroke-width="1"/>
-            </svg>
+    <section class="about-company" id="about-pillars">
+      <div class="container">
+        <div class="about-section-head fade-up">
+          <span class="about-section-label">Company Focus</span>
+          <h2>We connect music discovery with cultural storytelling.</h2>
+        </div>
+
+        <div class="about-card-grid">
+          <article class="about-card fade-up">
+            <span class="about-card-num">01</span>
+            <h3>Discovery</h3>
+            <p>We surface artists, songs, and creative scenes before they become obvious. The goal is to make discovery feel intentional, credible, and useful.</p>
+          </article>
+          <article class="about-card fade-up">
+            <span class="about-card-num">02</span>
+            <h3>Curation</h3>
+            <p>We organize music through profiles, charts, playlists, and editorial direction so audiences can understand what matters and why it matters.</p>
+          </article>
+          <article class="about-card fade-up">
+            <span class="about-card-num">03</span>
+            <h3>Storytelling</h3>
+            <p>We give artists context beyond a single release by documenting their sound, career, influences, and role in the wider culture.</p>
+          </article>
+        </div>
+
+        <div class="about-operating-grid fade-up">
+          <div>
+            <span class="about-section-label">How we work</span>
+            <h2>Clear taste. Real context. Consistent attention.</h2>
           </div>
-        </div>
-        <div class="pillar-text">
-          <div class="pillar-label">Discovery</div>
-          <h2 class="pillar-title">Find what the world<br>hasn't heard yet.</h2>
-          <p class="pillar-body">We are the bridge for listeners to access breakthrough talent. Our mission is to ensure that extraordinary underground sounds aren't just created, but actually explored and celebrated.</p>
-        </div>
-      </div>
-
-      <div class="pillar-row fade-up" id="pillar-curation">
-        <div class="pillar-text">
-          <div class="pillar-label">Curation</div>
-          <h2 class="pillar-title">Selection crafted with<br>intent and depth.</h2>
-          <p class="pillar-body">Selection matters. We focus on artists with a visionary approach, ensuring our platform's sonic identity remains as distinct as the cultures we champion.</p>
-        </div>
-        <div class="pillar-icon-wrap">
-          <div class="pillar-icon-frame">
-            <svg class="pillar-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="110" cy="110" r="100" fill="#1a1208" stroke="#FFD042" stroke-width="2"/>
-              <text x="110" y="30" fill="#FFD042" font-size="14" font-family="monospace" text-anchor="middle" font-weight="bold">N</text>
-              <polygon points="110,52 117,110 110,118 103,110" fill="#FFD042"/>
-              <polygon points="110,168 117,110 110,102 103,110" fill="#333"/>
-            </svg>
+          <div class="about-principles">
+            <p><strong>We listen first.</strong> Every feature begins with the music, the artist, and the scene around it.</p>
+            <p><strong>We choose carefully.</strong> Not everything needs to be covered. The value is in selection, timing, and perspective.</p>
+            <p><strong>We build for artists and audiences.</strong> Artists need visibility with meaning. Audiences need a trusted place to find what is worth their time.</p>
           </div>
         </div>
       </div>
@@ -4263,7 +4346,3 @@
   <script type="module" src="main.js"></script>
 </body>
 </html>
-
-
-
-
