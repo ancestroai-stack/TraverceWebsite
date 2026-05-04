@@ -3681,9 +3681,19 @@ body.cart-open {
 
 .footer-top {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);
   gap: 4rem;
   margin-bottom: 4rem;
+  align-items: start;
+}
+
+.footer-brand-col {
+  max-width: 360px;
+}
+
+.footer-top .footer-col {
+  justify-self: end;
+  min-width: 220px;
 }
 
 .footer-brand-name {
@@ -4091,6 +4101,11 @@ body.cart-open {
   .footer-top {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .footer-top .footer-col {
+    justify-self: start;
+    min-width: 0;
   }
 }
 
