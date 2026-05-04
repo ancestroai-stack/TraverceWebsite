@@ -95,18 +95,21 @@ import * as htmlToImage from 'html-to-image';
       requestAnimationFrame(() => {
         audio.play().catch(() => {});
       });
-    } else if (track?.spotifyTrackId) {
+    } else if (track?.spotifyTrackId || track?.spotifyId) {
+      const spotifyType = track.spotifyType || 'track';
+      const spotifyId = track.spotifyId || track.spotifyTrackId;
       const iframe = document.createElement('iframe');
-      iframe.src = `https://open.spotify.com/embed/track/${track.spotifyTrackId}?utm_source=generator`;
+      iframe.src = `https://open.spotify.com/embed/${spotifyType}/${spotifyId}?utm_source=generator&theme=0`;
       iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
       iframe.loading = 'lazy';
       iframe.referrerPolicy = 'strict-origin-when-cross-origin';
       iframe.title = `${track.name} on Spotify`;
+      iframe.dataset.spotifyType = spotifyType;
       spotifyPlayerMount.appendChild(iframe);
 
       const hint = document.createElement('p');
       hint.className = 'spotify-player-hint';
-      hint.textContent = 'Spotify does not expose a preview clip for this track, so this opens the official player.';
+      hint.textContent = 'Playback opens in the official Spotify player.';
       spotifyPlayerMount.appendChild(hint);
     } else {
       const fallback = document.createElement('p');
@@ -995,6 +998,23 @@ import * as htmlToImage from 'html-to-image';
   if (shareDownloadBtn) {
     shareDownloadBtn.addEventListener('click', downloadReport);
   }
+
+  document.querySelectorAll('.sonics-play-btn').forEach(button => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const card = button.closest('.sonics-card');
+      if (!card) return;
+
+      openSpotifyPlayer({
+        name: card.dataset.trackName,
+        artist: card.dataset.trackArtist,
+        spotifyType: card.dataset.spotifyType,
+        spotifyId: card.dataset.spotifyId
+      });
+    });
+  });
 
   if (spotifyModal && spotifyClose) {
     spotifyClose.addEventListener('click', closeSpotifyPlayer);

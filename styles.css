@@ -478,8 +478,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .sonics-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1px;
-  background: var(--border);
+  align-items: start;
+  gap: 0;
+  background: transparent;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .sonics-card {
@@ -487,12 +490,84 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   position: relative;
   overflow: hidden;
   cursor: default;
+  border-right: 1px solid rgba(255,255,255,0.055);
+}
+
+.sonics-card:last-child {
+  border-right: 0;
 }
 
 .sonics-card-img {
   aspect-ratio: 1;
   overflow: hidden;
   position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.065);
+}
+
+.sonics-play-btn {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,208,66,0.7);
+  border-radius: 999px;
+  background: rgba(16,16,16,0.82);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.34);
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity var(--t-fast), transform var(--t-fast), background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.sonics-play-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  margin-left: 2px;
+}
+
+.sonics-card-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.42) 100%);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+  pointer-events: none;
+}
+
+.sonics-card:hover .sonics-card-img::after,
+.sonics-card:focus-within .sonics-card-img::after,
+.sonics-card:hover .sonics-play-btn,
+.sonics-card:focus-within .sonics-play-btn {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.sonics-play-btn:hover,
+.sonics-play-btn:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  outline: none;
+  opacity: 1;
+  transform: translateY(0) scale(1.06);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .sonics-card-img::after,
+  .sonics-play-btn {
+    opacity: 1;
+  }
+
+  .sonics-play-btn {
+    transform: translateY(0) scale(1);
+  }
 }
 
 .sonics-card-img img {
@@ -543,8 +618,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .sonics-card-info {
-  padding: 0.85rem 0.75rem 1rem;
-  border-top: 1px solid var(--border);
+  min-height: 6.25rem;
+  padding: 0.85rem 0.75rem 0.9rem;
+  border-top: 0;
 }
 .sonics-card-tag {
   font-size: 0.6rem;
@@ -578,6 +654,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .sonics-card.featured .sonics-card-img {
   aspect-ratio: 1;
+}
+.sonics-card.featured .sonics-card-info {
+  min-height: 6.25rem;
 }
 
 /* ============================================================
@@ -3675,15 +3754,17 @@ body.cart-open {
 /* FOOTER GLOBAL REFINEMENT */
 .footer {
   border-top: 1px solid rgba(255,255,255,0.05);
-  padding: 6rem 0 3rem;
+  padding: clamp(3rem, 5vw, 4.5rem) 0 2rem;
   margin-top: auto;
 }
 
 .footer-top {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);
-  gap: 4rem;
-  margin-bottom: 4rem;
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, auto);
+  gap: clamp(2rem, 8vw, 8rem);
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   align-items: start;
 }
 
@@ -3693,7 +3774,7 @@ body.cart-open {
 
 .footer-top .footer-col {
   justify-self: end;
-  min-width: 220px;
+  min-width: 320px;
 }
 
 .footer-brand-name {
@@ -3712,12 +3793,18 @@ body.cart-open {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: var(--accent);
 }
 
-.footer-col ul { list-style: none; }
-.footer-col li { margin-bottom: 0.8rem; }
+.footer-col ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 0.85rem 2rem;
+}
+
+.footer-col li { margin-bottom: 0; }
 .footer-col a {
   color: var(--muted);
   text-decoration: none;
@@ -3727,13 +3814,19 @@ body.cart-open {
 
 
 .footer-bottom {
-  padding-top: 2rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 0;
+  border-top: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
   color: rgba(255,255,255,0.3);
   font-size: 0.8rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+  text-align: right;
 }
 
 /* ============================================================
@@ -4038,6 +4131,10 @@ body.cart-open {
   background: #000;
 }
 
+.spotify-player-shell iframe[data-spotify-type="album"] {
+  height: 352px;
+}
+
 .spotify-preview-audio {
   width: 100%;
 }
@@ -4098,14 +4195,74 @@ body.cart-open {
 }
 
 @media (max-width: 640px) {
+  .footer {
+    padding: 2.75rem 0 1.75rem;
+  }
+
   .footer-top {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.25rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.75rem;
+  }
+
+  .footer-brand-name {
+    font-size: 1.9rem;
+    line-height: 1;
+    margin-bottom: 1.25rem;
+  }
+
+  .footer-tagline {
+    margin-bottom: 0;
   }
 
   .footer-top .footer-col {
     justify-self: start;
     min-width: 0;
+    width: 100%;
+  }
+
+  .footer-col ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.5rem;
+  }
+
+  .footer-col h4 {
+    margin-bottom: 1.1rem;
+  }
+
+  .footer-col a {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+  }
+
+  .footer-bottom {
+    align-items: center;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .footer-bottom p {
+    text-align: center;
+    width: 100%;
+  }
+
+  .footer-socials-row {
+    gap: 1.25rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .footer-social-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 380px) {
+  .footer-col ul {
+    grid-template-columns: 1fr;
   }
 }
 
