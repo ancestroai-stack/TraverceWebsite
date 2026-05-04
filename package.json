@@ -8,10 +8,12 @@
     "dev": "vite",
     "build": "vite build",
     "dist": "npm run build",
+    "optimize:images": "node scripts/convert-images-to-webp.cjs",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "sharp": "^0.34.5",
     "vite": "^8.0.9"
   },
   "dependencies": {
