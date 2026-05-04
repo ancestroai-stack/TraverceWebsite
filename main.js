@@ -873,11 +873,11 @@ import * as htmlToImage from 'html-to-image';
 
   // Map tracks to artist images (for the premium report)
   const trackImages = {
-    'Hollow Frequencies': 'images/editorial2.png',
-    'Ocean Floor':        'images/artist1.png',
-    'Concrete Jungle':   'images/artist3.png',
-    'Groundbreaker':     'images/artist2.png',
-    'Pulse Lines':       'images/artist4.png'
+    'Hollow Frequencies': new URL('./images/editorial2.webp', import.meta.url).href,
+    'Ocean Floor':        new URL('./images/artist1.webp', import.meta.url).href,
+    'Concrete Jungle':    new URL('./images/artist3.webp', import.meta.url).href,
+    'Groundbreaker':      new URL('./images/artist2.webp', import.meta.url).href,
+    'Pulse Lines':        new URL('./images/artist4.webp', import.meta.url).href
   };
 
   async function downloadReport() {
@@ -910,7 +910,7 @@ import * as htmlToImage from 'html-to-image';
                            row.querySelector('.gc-trend').classList.contains('gc-down') ? 'down' : 'new';
         const plays = row.querySelector('.gc-plays').textContent;
         
-        const imgSrc = row.dataset.spotifyImg;
+        const imgSrc = row.dataset.spotifyImg || trackImages[trackName] || '';
 
         // Create report row
         const repRow = document.createElement('div');
