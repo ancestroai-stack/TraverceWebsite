@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        font-family: Poppins-SemiBold, Poppins;
+        font-size: 154.52px;
+        font-weight: 600;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #000;
+      }
+
+      .cls-2 {
+        font-family: Poppins-Medium, Poppins;
+        font-size: 31.75px;
+        font-weight: 500;
+      }
+
+      .cls-3 {
+        fill: #fbc853;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-3" x="-19" y="-20.41" width="1108.24" height="1119.53"/>
+  <g>
+    <text class="cls-1" transform="translate(190.9 559.89)"><tspan x="0" y="0">Traverce</tspan></text>
+    <text class="cls-2" transform="translate(875.85 568.77)"><tspan x="0" y="0">®</tspan></text>
+  </g>
+</svg>
