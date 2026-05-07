@@ -3830,7 +3830,9 @@ body.cart-open {
 }
 
 .footer-install-btn {
-  display: inline;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -3843,6 +3845,13 @@ body.cart-open {
   text-decoration: underline;
   text-underline-offset: 0.25em;
   transition: color var(--t-fast);
+}
+
+.footer-col .footer-install-btn {
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
 }
 
 .footer-install-btn:hover,
@@ -4275,7 +4284,6 @@ body.cart-open {
   }
 
   .footer-install-btn {
-    order: -1;
     width: auto;
   }
 

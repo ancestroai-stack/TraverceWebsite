@@ -225,7 +225,10 @@ import * as htmlToImage from 'html-to-image';
     });
 
     installAppBtn.addEventListener('click', async () => {
-      if (!deferredInstallPrompt) return;
+      if (!deferredInstallPrompt) {
+        window.alert('Install Traverce from your browser menu. On iPhone, tap Share, then Add to Home Screen.');
+        return;
+      }
 
       installAppBtn.disabled = true;
       deferredInstallPrompt.prompt();
