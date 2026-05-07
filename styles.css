@@ -3829,6 +3829,48 @@ body.cart-open {
   text-align: right;
 }
 
+.footer-install-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(251, 200, 83, 0.45);
+  border-radius: 6px;
+  background: rgba(251, 200, 83, 0.12);
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+
+.footer-install-btn[hidden] {
+  display: none;
+}
+
+.footer-install-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer-install-btn:hover,
+.footer-install-btn:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0a0a0a;
+  transform: translateY(-1px);
+}
+
+.footer-install-btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+}
+
 /* ============================================================
    GLOBAL CHART REPORT EXPORT (9:16)
    ============================================================ */
@@ -4246,6 +4288,11 @@ body.cart-open {
   .footer-bottom p {
     text-align: center;
     width: 100%;
+  }
+
+  .footer-install-btn {
+    order: -1;
+    width: min(100%, 240px);
   }
 
   .footer-socials-row {

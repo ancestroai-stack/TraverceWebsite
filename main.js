@@ -204,6 +204,54 @@ import * as htmlToImage from 'html-to-image';
   const orderConfirmation = document.getElementById('orderConfirmation');
   const orderNumber   = document.getElementById('orderNumber');
   const orderDone     = document.getElementById('orderDone');
+  const installAppBtn = document.getElementById('installAppBtn');
+  let deferredInstallPrompt = null;
+
+  function isStandaloneApp() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function initPwaInstall() {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((error) => {
+          console.warn('Traverce service worker registration failed:', error);
+        });
+      });
+    }
+
+    if (!installAppBtn || isStandaloneApp()) return;
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      installAppBtn.hidden = false;
+      installAppBtn.disabled = false;
+    });
+
+    installAppBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+
+      installAppBtn.disabled = true;
+      deferredInstallPrompt.prompt();
+
+      const choice = await deferredInstallPrompt.userChoice.catch(() => null);
+      deferredInstallPrompt = null;
+
+      if (choice?.outcome === 'accepted' || isStandaloneApp()) {
+        installAppBtn.hidden = true;
+      } else {
+        installAppBtn.disabled = false;
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      installAppBtn.hidden = true;
+    });
+  }
+
+  initPwaInstall();
 
   /* ── ENSURE NAV TOGGLE IS ALWAYS VISIBLE ON MOBILE ────────── */
   const mobileNavMedia = window.matchMedia('(max-width: 900px)');
