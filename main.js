@@ -207,10 +207,6 @@ import * as htmlToImage from 'html-to-image';
   const installAppBtn = document.getElementById('installAppBtn');
   let deferredInstallPrompt = null;
 
-  function isStandaloneApp() {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  }
-
   function initPwaInstall() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -220,12 +216,11 @@ import * as htmlToImage from 'html-to-image';
       });
     }
 
-    if (!installAppBtn || isStandaloneApp()) return;
+    if (!installAppBtn) return;
 
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();
       deferredInstallPrompt = event;
-      installAppBtn.hidden = false;
       installAppBtn.disabled = false;
     });
 
@@ -238,16 +233,12 @@ import * as htmlToImage from 'html-to-image';
       const choice = await deferredInstallPrompt.userChoice.catch(() => null);
       deferredInstallPrompt = null;
 
-      if (choice?.outcome === 'accepted' || isStandaloneApp()) {
-        installAppBtn.hidden = true;
-      } else {
-        installAppBtn.disabled = false;
-      }
+      installAppBtn.disabled = false;
     });
 
     window.addEventListener('appinstalled', () => {
       deferredInstallPrompt = null;
-      installAppBtn.hidden = true;
+      installAppBtn.disabled = false;
     });
   }
 
