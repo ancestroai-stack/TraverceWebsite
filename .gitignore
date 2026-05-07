@@ -3,3 +3,28 @@ dist
 .DS_Store
 *.local
 .env
+
+# Local IDE/agent config
+.continue/
+
+# Local Spotify/token diagnostics and scratch exports
+scratch/
+debug_*.js
+check_*.js
+check_*.cjs
+test_*.js
+test_*.cjs
+dump_playlist.js
+parse_dump.js
+inspect_playlist.js
+find_token.js
+get_token.js
+get_refresh_token.js
+artist_test.html
+mag44.html
+embed_dump.html
+playlist_dump.html
+
+# Duplicate generated assets kept out of the published app
+assets/shop cover.*
+images/slapdee_portrait.png
