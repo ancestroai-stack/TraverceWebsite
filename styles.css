@@ -3760,7 +3760,7 @@ body.cart-open {
 
 .footer-top {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(320px, auto);
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, auto) minmax(220px, auto);
   gap: clamp(2rem, 8vw, 8rem);
   margin-bottom: 2rem;
   padding-bottom: 2rem;
@@ -3775,6 +3775,10 @@ body.cart-open {
 .footer-top .footer-col {
   justify-self: end;
   min-width: 320px;
+}
+
+.footer-top .footer-contact-col {
+  min-width: 220px;
 }
 
 .footer-brand-name {
