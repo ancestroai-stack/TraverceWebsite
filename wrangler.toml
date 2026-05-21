@@ -6,8 +6,7 @@ name = "traverce-website"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Pages project name (matches your Cloudflare Pages dashboard)
-pages_build_output_dir = "dist"
+
 
 # ── D1 DATABASE ─────────────────────────────────────────────────────────
 # Run once to create: wrangler d1 create traverce-artists
