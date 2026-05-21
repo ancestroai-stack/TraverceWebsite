@@ -13,6 +13,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@emnapi/core": "^1.10.0",
+    "@emnapi/runtime": "^1.10.0",
     "sharp": "^0.34.5",
     "vite": "^8.0.9"
   },
