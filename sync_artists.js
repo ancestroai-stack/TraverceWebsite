@@ -493,7 +493,7 @@ async function sync() {
 
   console.log(`\n✨ Sync complete! ${syncedArtists.length} artists synced.`);
   if (unverifiedArtists.length > 0) {
-    console.log(`ℹ️  Visit ${TRAVERCE_API_URL ? TRAVERCE_API_URL : 'http://localhost:8788'}/admin.html to verify ${unverifiedArtists.length} pending artists.`);
+    console.log(`ℹ️  Visit ${TRAVERCE_API_URL ? TRAVERCE_API_URL : 'http://localhost:8788'}/backstage to verify ${unverifiedArtists.length} pending artists.`);
   }
 }
 

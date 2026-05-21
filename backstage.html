@@ -389,7 +389,7 @@
         sessionStorage.setItem('traverce_session', data.token);
         showStatus('Access granted. Loading…', 'success');
         setTimeout(() => {
-          window.location.href = '/admin.html';
+          window.location.href = '/admin';
         }, 600);
       } else {
         showStatus(data.error || 'Access denied.', 'error');
@@ -411,7 +411,7 @@
         headers: { 'X-Admin-Key': token },
       });
       if (res.ok) {
-        window.location.href = '/admin.html';
+        window.location.href = '/admin';
       } else {
         sessionStorage.removeItem('traverce_session');
       }

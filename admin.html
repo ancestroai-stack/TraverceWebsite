@@ -10,7 +10,7 @@
     (function() {
       const token = sessionStorage.getItem('traverce_session');
       if (!token) {
-        window.location.replace('/backstage.html');
+        window.location.replace('/backstage');
         document.documentElement.style.visibility = 'hidden';
       }
     })();
@@ -698,7 +698,7 @@
 
   function logout() {
     sessionStorage.removeItem('traverce_session');
-    window.location.replace('/backstage.html');
+    window.location.replace('/backstage');
   }
 
   // ── STATE ─────────────────────────────────────────────────
