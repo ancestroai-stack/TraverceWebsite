@@ -53,6 +53,7 @@ const FEATURED_PLAYLIST_ID = '6bkmEXVFb7zNtOzBvGGDK1';
 const NEW_SINGLE_PLAYLIST_ID = '3t8rA0UFBU3FJ3ijqq7eBd';
 const TRENDING_PLAYLIST_ID = '0Knatp2X7QhGt3d0EsJDhX';
 const ESSENTIAL_PLAYLIST_ID = '1zRzXB4TZWBSQmnAdNBSGq';
+const ZAMBIAN_CHARTS_PLAYLIST_ID = '66akVVFtLQuq3JaoBBxQwo';
 const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
 
 function escapeHtml(value = '') {
@@ -140,39 +141,190 @@ async function getPlaylistArtistIdsFromAPI(token) {
 
 async function getPlaylistTracksFromAPI(token, playlistId = PLAYLIST_ID, limit = 5) {
     console.log(`Reading ${limit} track(s) from Spotify playlist ${playlistId}...`);
-    const tracks = [];
-    let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50&market=ZM`;
+    try {
+        const tracks = [];
+        let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50&market=ZM`;
 
-    while (url && tracks.length < limit) {
-        const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
-        if (!res.ok) {
-            throw new Error(`Playlist tracks API failed: ${res.status} ${res.statusText}`);
+        while (url && tracks.length < limit) {
+            const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+            if (!res.ok) {
+                throw new Error(`Playlist tracks API failed: ${res.status} ${res.statusText}`);
+            }
+
+            const page = await res.json();
+            for (const item of page.items || []) {
+                const track = item.track;
+                if (!track || track.is_local) continue;
+
+                const album = track.album || {};
+                const artists = (track.artists || []).map(a => a.name).filter(Boolean);
+                tracks.push({
+                    id: track.id,
+                    name: track.name,
+                    artist: artists.join(', '),
+                    image: album.images?.[0]?.url || FALLBACK_IMAGE,
+                    spotifyType: album.album_type === 'album' ? 'album' : 'track',
+                    spotifyId: album.album_type === 'album' && album.id ? album.id : track.id
+                });
+
+                if (tracks.length >= limit) break;
+            }
+
+            url = page.next;
         }
 
-        const page = await res.json();
-        for (const item of page.items || []) {
-            const track = item.track;
-            if (!track || track.is_local) continue;
+        console.log(`Found ${tracks.length} Fresh Sonics playlist tracks.`);
+        return tracks;
+    } catch (e) {
+        console.warn(`${e.message}. Falling back to Spotify embed data for playlist ${playlistId}.`);
+        return getPlaylistTracksFromEmbed(token, playlistId, limit);
+    }
+}
 
-            const album = track.album || {};
-            const artists = (track.artists || []).map(a => a.name).filter(Boolean);
-            tracks.push({
-                id: track.id,
-                name: track.name,
-                artist: artists.join(', '),
-                image: album.images?.[0]?.url || FALLBACK_IMAGE,
-                spotifyType: album.album_type === 'album' ? 'album' : 'track',
-                spotifyId: album.album_type === 'album' && album.id ? album.id : track.id
-            });
-
-            if (tracks.length >= limit) break;
-        }
-
-        url = page.next;
+async function getTracksFromPlaylistEmbedData(playlistId, limit) {
+    const res = await fetch(`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator`, {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    if (!res.ok) {
+        throw new Error(`Spotify embed fetch failed: ${res.status} ${res.statusText}`);
     }
 
-    console.log(`Found ${tracks.length} Fresh Sonics playlist tracks.`);
-    return tracks;
+    const html = await res.text();
+    const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+    if (!match) {
+        throw new Error('Spotify embed data was not found.');
+    }
+
+    const data = JSON.parse(match[1]);
+    const trackList = data.props?.pageProps?.state?.data?.entity?.trackList || [];
+    return trackList
+        .map(track => ({
+            id: (track.uri || '').replace('spotify:track:', ''),
+            name: track.title || '',
+            artist: (track.subtitle || '').replace(/\u00a0/g, ' '),
+            previewUrl: track.audioPreview?.url || ''
+        }))
+        .filter(track => track.id && track.id.length === 22 && track.name)
+        .slice(0, limit);
+}
+
+async function getTrackOembed(id) {
+    const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(`https://open.spotify.com/track/${id}`)}`);
+    if (!res.ok) return {};
+    return res.json();
+}
+
+async function getPlaylistTracksFromEmbed(token, playlistId, limit = 5) {
+    const tracks = await getTracksFromPlaylistEmbedData(playlistId, limit);
+    return Promise.all(tracks.map(async track => {
+        const oembed = await getTrackOembed(track.id);
+        return {
+            id: track.id,
+            name: track.name,
+            artist: track.artist,
+            image: oembed.thumbnail_url || FALLBACK_IMAGE,
+            spotifyType: 'track',
+            spotifyId: track.id,
+            previewUrl: track.previewUrl
+        };
+    }));
+}
+
+async function getZambianChartTracksFromAPI(token, limit = 5) {
+    console.log(`Reading Zambian Charts from Spotify playlist ${ZAMBIAN_CHARTS_PLAYLIST_ID}...`);
+    try {
+        const tracks = [];
+        let url = `https://api.spotify.com/v1/playlists/${ZAMBIAN_CHARTS_PLAYLIST_ID}/tracks?limit=50&market=ZM`;
+
+        while (url && tracks.length < limit) {
+            const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+            if (!res.ok) {
+                throw new Error(`Zambian Charts playlist API failed: ${res.status} ${res.statusText}`);
+            }
+
+            const page = await res.json();
+            for (const item of page.items || []) {
+                const track = item.track;
+                if (!track || track.is_local) continue;
+
+                const album = track.album || {};
+                const artists = (track.artists || []).filter(a => a?.name);
+                let artistImage = album.images?.[0]?.url || FALLBACK_IMAGE;
+
+                if (artists[0]?.id) {
+                    try {
+                        const artistRes = await fetch(`https://api.spotify.com/v1/artists/${artists[0].id}`, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (artistRes.ok) {
+                            const artistData = await artistRes.json();
+                            artistImage = artistData.images?.[0]?.url || artistImage;
+                        }
+                    } catch (e) {
+                        console.warn(`Could not fetch chart artist image for ${artists[0].name}: ${e.message}`);
+                    }
+                }
+
+                tracks.push(chartTrackTemplate(track, tracks.length, artistImage));
+
+                if (tracks.length >= limit) break;
+            }
+
+            url = page.next;
+        }
+
+        console.log(`Found ${tracks.length} Zambian Charts tracks.`);
+        return tracks;
+    } catch (e) {
+        console.warn(`${e.message}. Falling back to Spotify embed data for Zambian Charts.`);
+        const tracks = await getPlaylistTracksFromEmbed(token, ZAMBIAN_CHARTS_PLAYLIST_ID, limit);
+        return tracks.map((track, index) => chartTrackFromEmbedTemplate(track, index));
+    }
+}
+
+function chartTrackTemplate(track, index, artistImage) {
+    const album = track.album || {};
+    const artists = (track.artists || []).filter(a => a?.name);
+    return {
+        rank: String(index + 1).padStart(2, '0'),
+        name: track.name,
+        artist: artists.map(a => a.name).join(', '),
+        image: album.images?.[0]?.url || FALLBACK_IMAGE,
+        year: Number((album.release_date || '').slice(0, 4)) || new Date().getFullYear(),
+        previewUrl: track.preview_url || '',
+        plays: 'NEW',
+        trend: 'new',
+        artistImage,
+        spotifyTrackId: track.id || '',
+        trackUrl: track.external_urls?.spotify || ''
+    };
+}
+
+function chartTrackFromEmbedTemplate(track, index) {
+    return {
+        rank: String(index + 1).padStart(2, '0'),
+        name: track.name,
+        artist: track.artist,
+        image: track.image || FALLBACK_IMAGE,
+        year: new Date().getFullYear(),
+        previewUrl: track.previewUrl || '',
+        plays: 'NEW',
+        trend: 'new',
+        artistImage: track.image || FALLBACK_IMAGE,
+        spotifyTrackId: track.id || '',
+        spotifyId: track.id || '',
+        spotifyType: 'track',
+        trackUrl: track.id ? `https://open.spotify.com/track/${track.id}` : ''
+    };
+}
+
+async function readPlaylistTracksSafely(label, readFn) {
+    try {
+        return await readFn();
+    } catch (e) {
+        console.warn(`Could not sync ${label}: ${e.message}`);
+        return [];
+    }
 }
 
 const FRESH_SONICS_TAGS = ['LATEST DROP', 'FEATURED', 'NEW SINGLE', 'TRENDING', 'ESSENTIAL'];
@@ -215,6 +367,64 @@ function updateFreshSonicsHtml(html, tracks) {
     }
 
     return nextHtml;
+}
+
+function updateSpotifyChartsJs(js, tracks) {
+    if (!tracks.length) return js;
+
+    const chartJson = JSON.stringify(tracks, null, 8)
+        .split('\n')
+        .map((line, index) => index === 0 ? line : `    ${line}`)
+        .join('\n');
+
+    const functionIndex = js.indexOf('async function fetchSpotifyCharts()');
+    const returnIndex = js.indexOf('return', functionIndex);
+    const arrayStart = js.indexOf('[', returnIndex);
+    if (functionIndex === -1 || returnIndex === -1 || arrayStart === -1) {
+        throw new Error('Could not find fetchSpotifyCharts array in main.js.');
+    }
+
+    let depth = 0;
+    let inString = false;
+    let stringQuote = '';
+    let escaped = false;
+    let arrayEnd = -1;
+
+    for (let i = arrayStart; i < js.length; i += 1) {
+        const char = js[i];
+
+        if (inString) {
+            if (escaped) {
+                escaped = false;
+            } else if (char === '\\') {
+                escaped = true;
+            } else if (char === stringQuote) {
+                inString = false;
+            }
+            continue;
+        }
+
+        if (char === '"' || char === "'" || char === '`') {
+            inString = true;
+            stringQuote = char;
+            continue;
+        }
+
+        if (char === '[') depth += 1;
+        if (char === ']') {
+            depth -= 1;
+            if (depth === 0) {
+                arrayEnd = i;
+                break;
+            }
+        }
+    }
+
+    if (arrayEnd === -1) {
+        throw new Error('Could not find the end of fetchSpotifyCharts array in main.js.');
+    }
+
+    return `${js.slice(0, arrayStart)}${chartJson}${js.slice(arrayEnd + 1)}`;
 }
 
 async function getArtistBio(artistName) {
@@ -495,23 +705,28 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
 async function sync() {
     const auth = await getAccessToken();
     const token = auth.token;
-    let freshSonicsTracks = [];
+    let zambianChartTracks = [];
     if (auth.canReadPlaylist) {
-        const primaryFreshSonicsTracks = await getPlaylistTracksFromAPI(token, PLAYLIST_ID, 1);
-        const featuredTracks = await getPlaylistTracksFromAPI(token, FEATURED_PLAYLIST_ID, 1);
-        const newSingleTracks = await getPlaylistTracksFromAPI(token, NEW_SINGLE_PLAYLIST_ID, 1);
-        const trendingTracks = await getPlaylistTracksFromAPI(token, TRENDING_PLAYLIST_ID, 1);
-        const essentialTracks = await getPlaylistTracksFromAPI(token, ESSENTIAL_PLAYLIST_ID, 1);
-        freshSonicsTracks = [
-            primaryFreshSonicsTracks[0],
-            featuredTracks[0],
-            newSingleTracks[0],
-            trendingTracks[0],
-            essentialTracks[0]
-        ].filter(Boolean);
+        zambianChartTracks = await readPlaylistTracksSafely('Zambian Charts playlist', () => getZambianChartTracksFromAPI(token, 5));
     } else {
-        console.warn('No SPOTIFY_REFRESH_TOKEN configured, so Fresh Sonics will keep the current static cards.');
+        console.warn('No SPOTIFY_REFRESH_TOKEN configured, so Zambian Charts will keep its current static data.');
     }
+
+    if (process.argv.includes('--playlists-only')) {
+        let js = fs.readFileSync(JS_FILE, 'utf8');
+
+        if (zambianChartTracks.length === 5) {
+            js = updateSpotifyChartsJs(js, zambianChartTracks);
+            console.log('Zambian Charts updated from playlist.');
+        } else {
+            console.warn(`Zambian Charts was not updated because only ${zambianChartTracks.length}/5 playlist tracks were available.`);
+        }
+
+        fs.writeFileSync(JS_FILE, js);
+        console.log('\nPlaylist sync complete.');
+        return;
+    }
+
     console.log('🔄 Starting Automated Artist Sync...');
     
     // 1. Use hardcoded ARTIST_IDS (Spotify client_credentials cannot access user playlist tracks)
@@ -561,7 +776,6 @@ async function sync() {
     const gridHtml = artists.map(a => ARTIST_CARD_TEMPLATE(a)).join('\n');
     const pagesHtml = artists.map(a => ARTIST_PAGE_TEMPLATE(a)).join('\n');
 
-    html = updateFreshSonicsHtml(html, freshSonicsTracks);
     html = html.replace(/(<!-- ARTIST_GRID_START -->)[\s\S]*?(<!-- ARTIST_GRID_END -->)/, `$1\n        ${gridHtml.trim()}\n        $2`);
     html = html.replace(/(<!-- ARTIST_PAGES_START -->)[\s\S]*?(<!-- ARTIST_PAGES_END -->)/, `$1\n    ${pagesHtml.trim()}\n    $2`);
     fs.writeFileSync(HTML_FILE, html);
@@ -570,6 +784,11 @@ async function sync() {
     const slugList = artists.map(a => `'${a.slug}'`).join(', ');
     const toggleList = artists.map(a => `    ['${a.slug}Toggle', '${a.slug}Body'],`).join('\n');
 
+    if (zambianChartTracks.length === 5) {
+        js = updateSpotifyChartsJs(js, zambianChartTracks);
+    } else if (zambianChartTracks.length > 0) {
+        console.warn(`Zambian Charts was not updated because only ${zambianChartTracks.length}/5 playlist tracks were available.`);
+    }
     js = js.replace(/(\/\* ARTIST_TABS_START \*\/)[\s\S]*?(\/\* ARTIST_TABS_END \*\/)/, `$1\n      ${slugList},\n      $2`);
     js = js.replace(/(\/\* ARTIST_TOGGLES_START \*\/)[\s\S]*?(\/\* ARTIST_TOGGLES_END \*\/)/, `$1\n${toggleList}\n    $2`);
     fs.writeFileSync(JS_FILE, js);
