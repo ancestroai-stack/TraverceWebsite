@@ -20,62 +20,82 @@ import * as htmlToImage from 'html-to-image';
   // We've hardcoded your "Traverce Top 10" playlist here to keep the site fast and static.
   async function fetchSpotifyCharts() {
     return [
-        {
-          "rank": "01",
-          "name": "Budget",
-          "artist": "Yo Maps, Frank Ro, Dizmo, KingTec",
-          "image": "https://i.scdn.co/image/ab67616d0000b2731228a8f88ba91b3f6646928b",
-          "year": 2026,
-          "previewUrl": "",
-          "plays": "NEW",
-          "trend": "new",
-          "artistImage": "https://i.scdn.co/image/ab6761610000e5eb30574ae9b280bf3c228d4260"
-        },
-        {
-          "rank": "02",
-          "name": "Streams & Shazam Numbers",
-          "artist": "Jae Cash",
-          "image": "https://i.scdn.co/image/ab67616d0000b2734fff9dd3f6e2fed7b2bd8f77",
-          "year": 2025,
-          "previewUrl": "",
-          "plays": "NEW",
-          "trend": "new",
-          "artistImage": "https://i.scdn.co/image/ab6761610000e5eb73ed5a4fd12b6c8f3d6df44f"
-        },
-        {
-          "rank": "03",
-          "name": "Weka",
-          "artist": "Bomb$hell Grenade, Yo Maps",
-          "image": "https://i.scdn.co/image/ab67616d0000b273a53c463745e85be8544cf308",
-          "year": 2026,
-          "previewUrl": "",
-          "plays": "NEW",
-          "trend": "new",
-          "artistImage": "https://i.scdn.co/image/ab6761610000e5ebbe366637d910b4ee9d7ecdec"
-        },
-        {
-          "rank": "04",
-          "name": "Chingelengele (feat. Chile One)",
-          "artist": "Drimz Mr Muziq, Chile One",
-          "image": "https://i.scdn.co/image/ab67616d0000b273dfbb9b0e5fa9654667db354c",
-          "year": 2026,
-          "previewUrl": "",
-          "plays": "NEW",
-          "trend": "new",
-          "artistImage": "https://i.scdn.co/image/ab6761610000e5eb7d2980092e059cf0f237d1aa"
-        },
-        {
-          "rank": "05",
-          "name": "Dzaddy",
-          "artist": "Ndine Emma, Shokki Mwana Chibolya, Kayz Adams, Mwaka Hal",
-          "image": "https://i.scdn.co/image/ab67616d0000b2734901a6c044e7094e053a6caa",
-          "year": 2025,
-          "previewUrl": "",
-          "plays": "NEW",
-          "trend": "new",
-          "artistImage": "https://i.scdn.co/image/ab6761610000e5ebe77cea2ecae791df1b739392"
-        }
-      ];
+            {
+                    "rank": "01",
+                    "name": "Dzaddy",
+                    "artist": "Ndine Emma, Shokki Mwana Chibolya, Kayz Adams, Mwaka Hal",
+                    "image": "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e024901a6c044e7094e053a6caa",
+                    "year": 2026,
+                    "previewUrl": "https://p.scdn.co/mp3-preview/d2ff2fcc17bca7264dc71593afd619c33d212dcf",
+                    "plays": "NEW",
+                    "trend": "new",
+                    "artistImage": "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e024901a6c044e7094e053a6caa",
+                    "spotifyTrackId": "49hOYEna9aXmp6NYCeOBl1",
+                    "spotifyId": "49hOYEna9aXmp6NYCeOBl1",
+                    "spotifyType": "track",
+                    "trackUrl": "https://open.spotify.com/track/49hOYEna9aXmp6NYCeOBl1"
+            },
+            {
+                    "rank": "02",
+                    "name": "Budget",
+                    "artist": "Yo Maps, Frank Ro, Dizmo, KingTec",
+                    "image": "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021228a8f88ba91b3f6646928b",
+                    "year": 2026,
+                    "previewUrl": "https://p.scdn.co/mp3-preview/f214fc418164c76a0d648d86dedd1aba5af64620",
+                    "plays": "NEW",
+                    "trend": "new",
+                    "artistImage": "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021228a8f88ba91b3f6646928b",
+                    "spotifyTrackId": "1ulPW7cmYv1dpZeYIVqJo5",
+                    "spotifyId": "1ulPW7cmYv1dpZeYIVqJo5",
+                    "spotifyType": "track",
+                    "trackUrl": "https://open.spotify.com/track/1ulPW7cmYv1dpZeYIVqJo5"
+            },
+            {
+                    "rank": "03",
+                    "name": "Streams & Shazam Numbers",
+                    "artist": "Jae Cash",
+                    "image": "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e024fff9dd3f6e2fed7b2bd8f77",
+                    "year": 2026,
+                    "previewUrl": "https://p.scdn.co/mp3-preview/627a35ae1d16e9d87280130069b2b3c95f4d9772",
+                    "plays": "NEW",
+                    "trend": "new",
+                    "artistImage": "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e024fff9dd3f6e2fed7b2bd8f77",
+                    "spotifyTrackId": "78yA7dTB664b4TR8W6GMcc",
+                    "spotifyId": "78yA7dTB664b4TR8W6GMcc",
+                    "spotifyType": "track",
+                    "trackUrl": "https://open.spotify.com/track/78yA7dTB664b4TR8W6GMcc"
+            },
+            {
+                    "rank": "04",
+                    "name": "Weka",
+                    "artist": "Bomb$hell Grenade, Yo Maps",
+                    "image": "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02a53c463745e85be8544cf308",
+                    "year": 2026,
+                    "previewUrl": "https://p.scdn.co/mp3-preview/327b88b17ba7305017892868f16eac7865b5217a",
+                    "plays": "NEW",
+                    "trend": "new",
+                    "artistImage": "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02a53c463745e85be8544cf308",
+                    "spotifyTrackId": "4VwrW4Sj3H8j0IcsJMQQwL",
+                    "spotifyId": "4VwrW4Sj3H8j0IcsJMQQwL",
+                    "spotifyType": "track",
+                    "trackUrl": "https://open.spotify.com/track/4VwrW4Sj3H8j0IcsJMQQwL"
+            },
+            {
+                    "rank": "05",
+                    "name": "Chingelengele (feat. Chile One)",
+                    "artist": "Drimz Mr Muziq, Chile One",
+                    "image": "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02dfbb9b0e5fa9654667db354c",
+                    "year": 2026,
+                    "previewUrl": "https://p.scdn.co/mp3-preview/d98d93ed0f05277415c5e09bfc22a9032df32b3b",
+                    "plays": "NEW",
+                    "trend": "new",
+                    "artistImage": "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02dfbb9b0e5fa9654667db354c",
+                    "spotifyTrackId": "1Ng5sQ4aRrIe8icgSP8nPi",
+                    "spotifyId": "1Ng5sQ4aRrIe8icgSP8nPi",
+                    "spotifyType": "track",
+                    "trackUrl": "https://open.spotify.com/track/1Ng5sQ4aRrIe8icgSP8nPi"
+            }
+    ];
   }
 
   function openSpotifyPlayer(track) {
