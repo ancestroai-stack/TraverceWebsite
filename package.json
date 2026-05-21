@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node sync_artists.js",
     "dev": "vite",
-    "build": "vite build",
+    "sync:spotify": "node sync_artists.js",
+    "build": "node sync_artists.js && vite build",
     "dist": "npm run build",
     "optimize:images": "node scripts/convert-images-to-webp.cjs",
     "preview": "vite preview",

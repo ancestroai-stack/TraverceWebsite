@@ -49,7 +49,20 @@ const ARTIST_IDS = [
 ];
 
 const PLAYLIST_ID = '7nC2I08ZK98QLzR3Ov3HvG';
+const FEATURED_PLAYLIST_ID = '6bkmEXVFb7zNtOzBvGGDK1';
+const NEW_SINGLE_PLAYLIST_ID = '3t8rA0UFBU3FJ3ijqq7eBd';
+const TRENDING_PLAYLIST_ID = '0Knatp2X7QhGt3d0EsJDhX';
+const ESSENTIAL_PLAYLIST_ID = '1zRzXB4TZWBSQmnAdNBSGq';
 const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
+
+function escapeHtml(value = '') {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 // Gets an access token. If SPOTIFY_REFRESH_TOKEN is set (GitHub Secret),
 // uses the user OAuth token which CAN read playlist tracks.
@@ -125,7 +138,84 @@ async function getPlaylistArtistIdsFromAPI(token) {
     return [...artistIds];
 }
 
+async function getPlaylistTracksFromAPI(token, playlistId = PLAYLIST_ID, limit = 5) {
+    console.log(`Reading ${limit} track(s) from Spotify playlist ${playlistId}...`);
+    const tracks = [];
+    let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50&market=ZM`;
 
+    while (url && tracks.length < limit) {
+        const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) {
+            throw new Error(`Playlist tracks API failed: ${res.status} ${res.statusText}`);
+        }
+
+        const page = await res.json();
+        for (const item of page.items || []) {
+            const track = item.track;
+            if (!track || track.is_local) continue;
+
+            const album = track.album || {};
+            const artists = (track.artists || []).map(a => a.name).filter(Boolean);
+            tracks.push({
+                id: track.id,
+                name: track.name,
+                artist: artists.join(', '),
+                image: album.images?.[0]?.url || FALLBACK_IMAGE,
+                spotifyType: album.album_type === 'album' ? 'album' : 'track',
+                spotifyId: album.album_type === 'album' && album.id ? album.id : track.id
+            });
+
+            if (tracks.length >= limit) break;
+        }
+
+        url = page.next;
+    }
+
+    console.log(`Found ${tracks.length} Fresh Sonics playlist tracks.`);
+    return tracks;
+}
+
+const FRESH_SONICS_TAGS = ['LATEST DROP', 'FEATURED', 'NEW SINGLE', 'TRENDING', 'ESSENTIAL'];
+
+function freshSonicsCardTemplate(track, index) {
+    const featuredClass = index === 0 ? ' featured' : '';
+    const type = escapeHtml(track.spotifyType || 'track');
+    const id = escapeHtml(track.spotifyId || track.id);
+    const name = escapeHtml(track.name);
+    const artist = escapeHtml(track.artist);
+    const image = escapeHtml(track.image || FALLBACK_IMAGE);
+    const tag = escapeHtml(FRESH_SONICS_TAGS[index] || 'FEATURED');
+
+    return `              <div class="sonics-card${featuredClass}" data-spotify-type="${type}" data-spotify-id="${id}" data-track-name="${name}" data-track-artist="${artist}">
+                <div class="sonics-card-img">
+                  <img src="${image}" alt="${artist} - ${name}" loading="lazy" />
+                  <button class="sonics-play-btn" type="button" aria-label="Play ${name} by ${artist} on Spotify">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.14v13.72L18.79 12 8 5.14z"/></svg>
+                  </button>
+                </div>
+                <div class="sonics-card-info">
+                  <div class="sonics-card-tag">${tag}</div>
+                  <div class="sonics-card-name">${name}</div>
+                  <div class="sonics-card-sub">${artist}</div>
+                </div>
+              </div>`;
+}
+
+function updateFreshSonicsHtml(html, tracks) {
+    if (!tracks.length) return html;
+
+    const cardsHtml = tracks.map(freshSonicsCardTemplate).join('\n\n');
+    const nextHtml = html.replace(
+        /(<div class="sonics-grid fade-up">)[\s\S]*?(\n\s*<\/div>\s*\n\s*<\/div>\s*\n\s*<\/div>\s*\n\s*<!--)/,
+        `$1\n${cardsHtml}\n            $2`
+    );
+
+    if (nextHtml === html) {
+        throw new Error('Could not find Fresh Sonics grid in index.html.');
+    }
+
+    return nextHtml;
+}
 
 async function getArtistBio(artistName) {
     // 1. Wikipedia — direct title lookup with redirects
@@ -403,10 +493,36 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
     </div>`;
 
 async function sync() {
+    const auth = await getAccessToken();
+    const token = auth.token;
+    let freshSonicsTracks = [];
+    if (auth.canReadPlaylist) {
+        const primaryFreshSonicsTracks = await getPlaylistTracksFromAPI(token, PLAYLIST_ID, 1);
+        const featuredTracks = await getPlaylistTracksFromAPI(token, FEATURED_PLAYLIST_ID, 1);
+        const newSingleTracks = await getPlaylistTracksFromAPI(token, NEW_SINGLE_PLAYLIST_ID, 1);
+        const trendingTracks = await getPlaylistTracksFromAPI(token, TRENDING_PLAYLIST_ID, 1);
+        const essentialTracks = await getPlaylistTracksFromAPI(token, ESSENTIAL_PLAYLIST_ID, 1);
+        freshSonicsTracks = [
+            primaryFreshSonicsTracks[0],
+            featuredTracks[0],
+            newSingleTracks[0],
+            trendingTracks[0],
+            essentialTracks[0]
+        ].filter(Boolean);
+    } else {
+        console.warn('No SPOTIFY_REFRESH_TOKEN configured, so Fresh Sonics will keep the current static cards.');
+    }
     console.log('🔄 Starting Automated Artist Sync...');
     
     // 1. Use hardcoded ARTIST_IDS (Spotify client_credentials cannot access user playlist tracks)
-    const artistIds = ARTIST_IDS.filter(id => id && id.trim().length === 22);
+    let artistIds = ARTIST_IDS.filter(id => id && id.trim().length === 22);
+    if (auth.canReadPlaylist) {
+        try {
+            artistIds = await getPlaylistArtistIdsFromAPI(token);
+        } catch (e) {
+            console.warn(`Could not read artist IDs from playlist, using hardcoded list: ${e.message}`);
+        }
+    }
     console.log(`📋 Syncing ${artistIds.length} artists from hardcoded list.`);
     if (artistIds.length === 0) {
         console.error('❌ ARTIST_IDS list is empty — add Spotify artist IDs to sync_artists.js');
@@ -414,7 +530,6 @@ async function sync() {
     }
 
     // 2. Get Data
-    const token = await getAccessToken();
     const artists = [];
 
     for (const id of artistIds) {
@@ -446,6 +561,7 @@ async function sync() {
     const gridHtml = artists.map(a => ARTIST_CARD_TEMPLATE(a)).join('\n');
     const pagesHtml = artists.map(a => ARTIST_PAGE_TEMPLATE(a)).join('\n');
 
+    html = updateFreshSonicsHtml(html, freshSonicsTracks);
     html = html.replace(/(<!-- ARTIST_GRID_START -->)[\s\S]*?(<!-- ARTIST_GRID_END -->)/, `$1\n        ${gridHtml.trim()}\n        $2`);
     html = html.replace(/(<!-- ARTIST_PAGES_START -->)[\s\S]*?(<!-- ARTIST_PAGES_END -->)/, `$1\n    ${pagesHtml.trim()}\n    $2`);
     fs.writeFileSync(HTML_FILE, html);
