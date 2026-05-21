@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Traverce — Admin Portal</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <!-- ── AUTH GUARD — redirect to /backstage if not logged in ── -->
+  <script>
+    (function() {
+      const token = sessionStorage.getItem('traverce_session');
+      if (!token) {
+        window.location.replace('/backstage.html');
+        document.documentElement.style.visibility = 'hidden';
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
@@ -423,7 +434,8 @@
       </div>
     </nav>
     <div class="sidebar-footer">
-      <a href="/" class="sidebar-back-btn">← Back to Site</a>
+      <a href="/" class="sidebar-back-btn" style="margin-bottom:0.5rem;">← Back to Site</a>
+      <button onclick="logout()" style="display:block;width:100%;padding:0.55rem 1rem;background:rgba(239,68,68,0.1);color:#ef4444;font-size:0.75rem;font-family:var(--font);border:1px solid rgba(239,68,68,0.2);border-radius:4px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">⏻ Logout</button>
     </div>
   </aside>
 
@@ -671,23 +683,22 @@
 
 <script>
   // ── API CONFIG ────────────────────────────────────────────
-  // Admin key is read from localStorage (set on first prompt).
-  // In production this is your Cloudflare Pages TRAVERCE_ADMIN_KEY env var.
-  const API_BASE = window.location.origin; // /api/artists on same domain
+  // Token is stored in sessionStorage after login via /backstage
+  const API_BASE = window.location.origin;
 
   function getAdminKey() {
-    let key = localStorage.getItem('traverce_admin_key');
-    if (!key) {
-      key = prompt('Enter your Admin Key to continue:');
-      if (key) localStorage.setItem('traverce_admin_key', key.trim());
-    }
-    return key ? key.trim() : '';
+    return sessionStorage.getItem('traverce_session') || '';
   }
 
   function apiHeaders(write = false) {
     const h = { 'Content-Type': 'application/json' };
     if (write) h['X-Admin-Key'] = getAdminKey();
     return h;
+  }
+
+  function logout() {
+    sessionStorage.removeItem('traverce_session');
+    window.location.replace('/backstage.html');
   }
 
   // ── STATE ─────────────────────────────────────────────────
