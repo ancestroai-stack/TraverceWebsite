@@ -607,7 +607,7 @@ import * as htmlToImage from 'html-to-image';
     const hash = window.location.hash.replace('#', '');
     return ['home', 'artist', 
       /* ARTIST_TABS_START */
-      'lila-ik-', 'magixx', 'mahalia', 'teni', 'yo-maps', 'frank-ro', 'chef-187', 'xaven', 'kb', 'triple-m', 'jc-kalinks', 'tio-nason', 'chewe', 'mordecaii', 'esii', 'mag44', 'rustar', 'f-jay', 'the-f-a-k-e', 'kanina-kandalama', 'styve-ace', 'bad-boy-shezy', 'iamwaters', 'vleko', 'zaggar',
+      'lila-ik-', 'magixx', 'mahalia', 'teni', 'yo-maps', 'frank-ro', 'chef-187', 'xaven', 'kb', 'triple-m', 'jc-kalinks', 'mordecaii', 'tio-nason', 'chewe', 'esii', 'mag44', 'rustar', 'f-jay', 'the-f-a-k-e', 'kanina-kandalama', 'styve-ace', 'bad-boy-shezy', 'iamwaters', 'vleko', 'zaggar',
       /* ARTIST_TABS_END */
       'hub', 'shop', 'about'].includes(hash) ? hash : 'home';
   }
@@ -748,9 +748,9 @@ import * as htmlToImage from 'html-to-image';
     ['kbToggle', 'kbBody'],
     ['triple-mToggle', 'triple-mBody'],
     ['jc-kalinksToggle', 'jc-kalinksBody'],
+    ['mordecaiiToggle', 'mordecaiiBody'],
     ['tio-nasonToggle', 'tio-nasonBody'],
     ['cheweToggle', 'cheweBody'],
-    ['mordecaiiToggle', 'mordecaiiBody'],
     ['esiiToggle', 'esiiBody'],
     ['mag44Toggle', 'mag44Body'],
     ['rustarToggle', 'rustarBody'],

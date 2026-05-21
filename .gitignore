@@ -28,3 +28,7 @@ playlist_dump.html
 # Duplicate generated assets kept out of the published app
 assets/shop cover.*
 images/slapdee_portrait.png
+
+# Wrangler cache
+.wrangler/
+
