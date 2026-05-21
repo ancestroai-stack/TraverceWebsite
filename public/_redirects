@@ -1,6 +1,4 @@
 # Cloudflare Pages — URL Rewrites
-# Serves files at clean URLs (no .html extension needed)
-# 200 = rewrite (keeps the clean URL in the browser bar)
-
+# Admin portal clean URLs — must come BEFORE any catch-all
 /backstage    /backstage.html    200
 /admin        /admin.html        200
