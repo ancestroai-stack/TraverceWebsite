@@ -1,0 +1,19 @@
+# TRAVERCE — Wrangler Configuration
+# Cloudflare Pages + D1 Database
+
+name = "traverce-website"
+account_id = "37031315226e6658c9809e25798aad19"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages project name (matches your Cloudflare Pages dashboard)
+pages_build_output_dir = "dist"
+
+# ── D1 DATABASE ─────────────────────────────────────────────────────────
+# Run once to create: wrangler d1 create traverce-artists
+# Then copy the database_id from the output below.
+
+[[d1_databases]]
+binding       = "DB"
+database_name = "traverce-artists"
+database_id   = "095ca218-d06f-43c5-9847-c3a00158f9fc"

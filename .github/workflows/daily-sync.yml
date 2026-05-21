@@ -35,9 +35,9 @@ jobs:
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          git add index.html main.js
-          if [ -n "$(git status --porcelain index.html main.js)" ]; then
-            git commit -m "chore: automated artist sync from spotify"
+          git add index.html main.js artists_db.js
+          if [ -n "$(git status --porcelain index.html main.js artists_db.js)" ]; then
+            git commit -m "chore: automated artist sync from spotify (id-based)"
             git push origin main
           else
             echo "No changes to commit"

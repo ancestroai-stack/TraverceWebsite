@@ -1,291 +1,232 @@
 import fs from 'fs';
 import dotenv from 'dotenv';
+import { ARTISTS } from './artists_db.js';
 
 dotenv.config();
 
-const CLIENT_ID = process.env.VITE_SPOTIFY_CLIENT_ID;
+// ============================================================
+//  TRAVERCE — sync_artists.js (v2)
+//  ID-based artist sync. Uses artists_db.js as source of truth.
+//  NEVER searches Spotify by name — only uses spotify_artist_id.
+// ============================================================
+
+const CLIENT_ID     = process.env.VITE_SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.VITE_SPOTIFY_CLIENT_SECRET;
 
+// Cloudflare D1 API config (optional — set in .env to enable cloud sync)
+const TRAVERCE_API_URL   = process.env.TRAVERCE_API_URL;   // e.g. https://traverce.pages.dev
+const TRAVERCE_ADMIN_KEY = process.env.TRAVERCE_ADMIN_KEY; // matches Pages env var
+
 const HTML_FILE = 'index.html';
-const JS_FILE = 'main.js';
+const JS_FILE   = 'main.js';
+const DB_FILE   = 'artists_db.js';
 
-// Default BRAND image for fallback
-const FALLBACK_IMAGE = 'https://i.scdn.co/image/ab67616d0000b273b7ed663c9b74052ca5a8a183'; // Soulful Start Cover
+// Default fallback image
+const FALLBACK_IMAGE = 'https://i.scdn.co/image/ab67616d0000b273b7ed663c9b74052ca5a8a183';
 
-// ---------------------------------------------------------------------------
-// ARTIST IDs LIST — update this when you change the playlist.
-// WHY HARDCODED: Spotify client_credentials tokens (used in GitHub Actions /
-// Cloudflare builds) cannot access user-owned playlist tracks — the /tracks
-// endpoint returns 403. Scraping the Spotify HTML page also fails in headless
-// CI environments because the page requires JavaScript to render.
-// ---------------------------------------------------------------------------
-const ARTIST_IDS = [
-  '0uAUrmEQbwcDFzg0v7VicO', // Lila Ike
-  '0rskhjcLm5BxjwZDRs4142', // Magixx
-  '16rCzZOMQX7P8Kmn5YKexI', // Mahalia
-  '3ukrG1BmfEiuo0KDj8YTTS', // Teni
-  '6ctMiUYEAd4cy0CaH355Hk', // Yo Maps
-  '26fSO7cYQ1Txtb8xNi8byv', // Chef 187
-  '5Y8PQZPxzdPxPqGxoqKC5H', // Frank Ro
-  '5f24U3gtxTUPIRT2HujkHm', // Xaven
-  '3iBJAU4xa7sV1W9ZJO7uzK', // KB
-  '2rtXAAlmUadQoZk7iXi4Fe', // Triple M
-  '2ApKRJV8pKnEiq10xlTYTJ', // JC Kalinks
-  '44vOrGC9wQuBCQIeBUNc1O', // Tio Nason
-  '4fLTbvnsLjg1PHp1oEiWxl', // Chewe
-  '4Un29hGNtmUOCCGQWiInis', // ESII
-  '1S4KltOEUKNdbOd9RrI5Lg', // Mordecaii
-  '2cm1BTICMJaTYi6OpPchTm', // Rustar
-  '4O9BYjQLNhndddq00X0ALc', // The F.A.K.E
-  '3aufVL9SkQwm5GVFydc1GG', // F Jay
-  '3s9441fVkfNQrHBmXRFMWM', // Kanina Kandalama
-  '1CGpjhbMNattNmUtBaj31Q', // Styve Ace
-  '6T36EOpJj9B6SnyynRqpgG', // Bad Boy Shezy
-  '4OKrofOC9Ypgu1HBxZIMb0', // IamWaters
-  '2Ek5746GXl1ePTgpFBnbct', // Nyarai
-  '4GbzyoLPE0z6jvL5h9st3F', // Vleko
-  '4zefLiC0h0euXegWWgGq3p', // Zaggar
-  '0j5CGslS41MUjK6uekSHZU', // Extra artist
-];
 
-const PLAYLIST_ID = '7nC2I08ZK98QLzR3Ov3HvG';
-const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
-
-// Gets an access token. If SPOTIFY_REFRESH_TOKEN is set (GitHub Secret),
-// uses the user OAuth token which CAN read playlist tracks.
-// Otherwise falls back to client_credentials (can only read artist data).
+// ── TOKEN ────────────────────────────────────────────────────
 async function getAccessToken() {
-    if (REFRESH_TOKEN) {
-        // User token via refresh — can read playlist tracks
-        const response = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')
-            },
-            body: new URLSearchParams({
-                grant_type: 'refresh_token',
-                refresh_token: REFRESH_TOKEN
-            })
-        });
-        const data = await response.json();
-        if (data.access_token) {
-            console.log('🔑 Using user OAuth token (playlist-read enabled).');
-            return { token: data.access_token, canReadPlaylist: true };
-        }
-        console.warn('⚠️ Refresh token failed, falling back to client_credentials.');
-    }
+  const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
 
-    // Client credentials fallback — cannot read user playlist tracks
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')
-        },
-        body: 'grant_type=client_credentials'
+  if (REFRESH_TOKEN) {
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
+      },
+      body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: REFRESH_TOKEN }),
     });
-    const data = await response.json();
-    console.log('🔑 Using client_credentials token (hardcoded artist list only).');
-    return { token: data.access_token, canReadPlaylist: false };
-}
-
-// Reads all artist IDs directly from the Spotify playlist via the API.
-// Only works when called with a user OAuth token (refresh token configured).
-async function getPlaylistArtistIdsFromAPI(token) {
-    console.log('📡 Reading artists from Spotify playlist via API...');
-    const artistIds = new Set();
-
-    // First page is embedded in the playlist object
-    let url = `https://api.spotify.com/v1/playlists/${PLAYLIST_ID}`;
-    const firstRes = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
-    const playlist = await firstRes.json();
-
-    if (!playlist.tracks) {
-        throw new Error('Playlist tracks unavailable — token may lack playlist-read scope.');
+    const data = await res.json();
+    if (data.access_token) {
+      console.log('🔑 Using user OAuth token (refresh).');
+      return { token: data.access_token };
     }
+    console.warn('⚠️  Refresh token failed, falling back to client_credentials.');
+  }
 
-    (playlist.tracks.items || []).forEach(item => {
-        item.track?.artists?.forEach(a => a.id && artistIds.add(a.id));
-    });
-
-    // Paginate through remaining pages
-    let nextUrl = playlist.tracks.next;
-    while (nextUrl) {
-        const res = await fetch(nextUrl, { headers: { 'Authorization': 'Bearer ' + token } });
-        const page = await res.json();
-        if (!page.items) break;
-        page.items.forEach(item => {
-            item.track?.artists?.forEach(a => a.id && artistIds.add(a.id));
-        });
-        nextUrl = page.next;
-    }
-
-    console.log(`✅ Found ${artistIds.size} unique artists in playlist.`);
-    return [...artistIds];
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
+    },
+    body: 'grant_type=client_credentials',
+  });
+  const data = await res.json();
+  if (!data.access_token) {
+    throw new Error(`Token request failed: ${JSON.stringify(data)}`);
+  }
+  console.log('🔑 Using client_credentials token.');
+  return { token: data.access_token };
 }
 
 
-
+// ── BIO SCRAPING (fallback for artists without bio_manual) ───
 async function getArtistBio(artistName) {
-    // 1. Wikipedia — direct title lookup with redirects
-    try {
-        const directUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(artistName)}&format=json`;
-        const res = await fetch(directUrl);
-        const data = await res.json();
-        const pages = data.query?.pages;
-        if (pages) {
-            const page = Object.values(pages)[0];
-            if (page && page.extract && page.pageid !== -1 &&
-                !page.extract.toLowerCase().includes('may refer to:') &&
-                !page.extract.toLowerCase().includes('disambiguation')) {
-                const paragraphs = page.extract.split('\n').filter(p => p.trim().length > 80);
-                if (paragraphs.length > 0) return paragraphs.slice(0, 2).join('\n\n');
-            }
-        }
-    } catch (e) {
-        console.warn(`⚠️ Wikipedia direct lookup failed for ${artistName}`);
+  // 1. Wikipedia — direct lookup
+  try {
+    const url = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(artistName)}&format=json`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const pages = data.query?.pages;
+    if (pages) {
+      const page = Object.values(pages)[0];
+      if (page && page.extract && page.pageid !== -1 &&
+          !page.extract.toLowerCase().includes('may refer to:') &&
+          !page.extract.toLowerCase().includes('disambiguation')) {
+        const paras = page.extract.split('\n').filter(p => p.trim().length > 80);
+        if (paras.length > 0) return paras.slice(0, 2).join('\n\n');
+      }
     }
+  } catch { console.warn(`⚠️  Wikipedia direct lookup failed for ${artistName}`); }
 
-    // 2. Wikipedia — search fallback (catches stage name variations)
-    try {
-        const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(artistName + ' musician singer')}&srlimit=1&format=json`;
-        const sRes = await fetch(searchUrl);
-        const sData = await sRes.json();
-        const hits = sData.query?.search;
-        if (hits && hits.length > 0) {
-            const title = hits[0].title;
-            const pageUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}&format=json`;
-            const pRes = await fetch(pageUrl);
-            const pData = await pRes.json();
-            const pages = pData.query?.pages;
-            if (pages) {
-                const page = Object.values(pages)[0];
-                if (page && page.extract && page.pageid !== -1 &&
-                    !page.extract.toLowerCase().includes('may refer to:') &&
-                    !page.extract.toLowerCase().includes('disambiguation')) {
-                    const paragraphs = page.extract.split('\n').filter(p => p.trim().length > 80);
-                    if (paragraphs.length > 0) return paragraphs.slice(0, 2).join('\n\n');
-                }
-            }
+  // 2. Wikipedia — search fallback
+  try {
+    const sUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(artistName + ' musician singer')}&srlimit=1&format=json`;
+    const sRes = await fetch(sUrl);
+    const sData = await sRes.json();
+    const hits = sData.query?.search;
+    if (hits && hits.length > 0) {
+      const title = hits[0].title;
+      const pUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}&format=json`;
+      const pRes = await fetch(pUrl);
+      const pData = await pRes.json();
+      const pages = pData.query?.pages;
+      if (pages) {
+        const page = Object.values(pages)[0];
+        if (page && page.extract && page.pageid !== -1 &&
+            !page.extract.toLowerCase().includes('may refer to:') &&
+            !page.extract.toLowerCase().includes('disambiguation')) {
+          const paras = page.extract.split('\n').filter(p => p.trim().length > 80);
+          if (paras.length > 0) return paras.slice(0, 2).join('\n\n');
         }
-    } catch (e) {
-        console.warn(`⚠️ Wikipedia search failed for ${artistName}`);
+      }
     }
+  } catch { console.warn(`⚠️  Wikipedia search failed for ${artistName}`); }
 
-    // 3. Last.fm fallback
-    try {
-        const res = await fetch(`https://www.last.fm/music/${encodeURIComponent(artistName)}/+wiki`, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TraverceBot/1.0)' }
-        });
-        if (res.ok) {
-            const html = await res.text();
-            const match = html.match(/<div class="wiki-content">([\s\S]*?)<\/div>/);
-            if (match) {
-                const text = match[1].replace(/<[^>]+>/g, '').trim();
-                const paragraphs = text.split('\n').filter(p => p.trim().length > 60);
-                if (paragraphs.length > 0) return paragraphs.slice(0, 2).join('\n\n');
-            }
-        }
-    } catch (e) {
-        console.warn(`⚠️ Last.fm failed for ${artistName}`);
+  // 3. Last.fm fallback
+  try {
+    const res = await fetch(`https://www.last.fm/music/${encodeURIComponent(artistName)}/+wiki`, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TraverceBot/1.0)' },
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const match = html.match(/<div class="wiki-content">([\s\S]*?)<\/div>/);
+      if (match) {
+        const text = match[1].replace(/<[^>]+>/g, '').trim();
+        const paras = text.split('\n').filter(p => p.trim().length > 60);
+        if (paras.length > 0) return paras.slice(0, 2).join('\n\n');
+      }
     }
+  } catch { console.warn(`⚠️  Last.fm failed for ${artistName}`); }
 
-    return '';
+  return '';
 }
 
 
-async function getArtistData(token, id) {
-    // Attempt multiple markets if ZM fails or returns empty
-    const markets = ['ZM', 'US', 'GB'];
-    let artist, albumsRaw, topTracks;
+// ── SPOTIFY DATA FETCH (by ID only) ─────────────────────────
+async function getSpotifyData(token, artistId) {
+  const markets = ['ZM', 'US', 'GB'];
 
-    const artistRes = await fetch(`https://api.spotify.com/v1/artists/${id}`, { headers: { 'Authorization': 'Bearer ' + token } });
-    if (!artistRes.ok) throw new Error(`Artist API failed: ${artistRes.status} ${artistRes.statusText}`);
-    artist = await artistRes.json();
+  // Artist profile
+  const artistRes = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+    headers: { 'Authorization': 'Bearer ' + token },
+  });
+  if (!artistRes.ok) throw new Error(`Artist API failed: ${artistRes.status} ${artistRes.statusText}`);
+  const artist = await artistRes.json();
 
-    // Try to get top tracks from various markets to ensure we get a stable image
-    for (const m of markets) {
-        const topTracksRes = await fetch(`https://api.spotify.com/v1/artists/${id}/top-tracks?market=${m}`, { headers: { 'Authorization': 'Bearer ' + token } });
-        if (!topTracksRes.ok) continue;
-        topTracks = await topTracksRes.json();
-        if (topTracks.tracks && topTracks.tracks.length > 0) break;
+  // Top tracks (try multiple markets)
+  let topTracks = null;
+  for (const m of markets) {
+    const ttRes = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=${m}`, {
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (!ttRes.ok) continue;
+    topTracks = await ttRes.json();
+    if (topTracks.tracks && topTracks.tracks.length > 0) break;
+  }
+
+  // Albums / singles — non-blocking: if it fails, we return empty releases
+  // Some Spotify app tiers restrict this endpoint. A 429 means rate-limited.
+  let albumsRaw = { items: [], total: 0 };
+  try {
+    const albumsRes = await fetch(
+      `https://api.spotify.com/v1/artists/${artistId}/albums?limit=10`,
+      { headers: { 'Authorization': 'Bearer ' + token } }
+    );
+    if (albumsRes.ok) {
+      albumsRaw = await albumsRes.json();
+    } else {
+      const errBody = await albumsRes.text();
+      console.warn(`   ℹ️ Albums unavailable for ${artistId}: ${albumsRes.status} ${errBody.slice(0, 80)}`);
     }
+  } catch (e) {
+    console.warn(`   ℹ️ Albums fetch failed for ${artistId}: ${e.message}`);
+  }
 
-    const albumsRes = await fetch(`https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single`, { headers: { 'Authorization': 'Bearer ' + token } });
-    if (!albumsRes.ok) throw new Error(`Albums API failed: ${albumsRes.status} ${albumsRes.statusText}`);
-    albumsRaw = await albumsRes.json();
+  // De-duplicate by name
+  const seenNames = new Set();
+  const releases = (albumsRaw.items || []).filter(a => {
+    const key = a.name.toLowerCase().trim();
+    if (seenNames.has(key)) return false;
+    seenNames.add(key);
+    return true;
+  }).slice(0, 6);
 
-    let releaseCount = albumsRaw.total || 0;
-    const seenNames = new Set();
-    const releases = (albumsRaw.items || []).filter(a => {
-        const key = a.name.toLowerCase().trim();
-        if (seenNames.has(key)) return false;
-        seenNames.add(key);
-        return true;
-    }).slice(0, 6);
+  // Followers & popularity (scrape fallback if zero)
+  let followers  = artist.followers?.total || 0;
+  let popularity = artist.popularity || 0;
+  if (followers === 0 || popularity === 0) {
+    try {
+      const htmlRes = await fetch(`https://open.spotify.com/artist/${artistId}`);
+      const html    = await htmlRes.text();
+      const mlMatch = html.match(/([\d,]+)\s*monthly listeners/i);
+      const folMatch = html.match(/"followers":\s*(?:{\s*"total":\s*)?(\d+)/i) ||
+                       html.match(/([\d,]+)\s*followers/i);
+      if (mlMatch) {
+        const ml = parseInt(mlMatch[1].replace(/,/g, ''), 10);
+        if (popularity === 0) popularity = Math.min(100, Math.floor(ml / 5000));
+        if (followers === 0)  followers  = Math.floor(ml * 0.4);
+      }
+      if (folMatch) followers = parseInt(folMatch[1].replace(/,/g, ''), 10);
+    } catch { /* silent */ }
+  }
 
-    // Fallback scrape for popularity/followers if API is omitting them
-    let followers = artist.followers?.total || 0;
-    let popularity = artist.popularity || 0;
-    
-    if (followers === 0 || popularity === 0) {
-        try {
-            const htmlRes = await fetch(`https://open.spotify.com/artist/${id}`);
-            const html = await htmlRes.text();
-            
-            const mlMatch = html.match(/([\d,]+)\s*monthly listeners/i);
-            const folMatch = html.match(/"followers":\s*(?:{\s*"total":\s*)?(\d+)/i) || html.match(/([\d,]+)\s*followers/i);
-            
-            if (mlMatch) {
-                const ml = parseInt(mlMatch[1].replace(/,/g, ''), 10);
-                if (popularity === 0) popularity = Math.min(100, Math.floor(ml / 5000));
-                if (followers === 0) followers = Math.floor(ml * 0.4); 
-            }
-            if (folMatch) {
-                followers = parseInt(folMatch[1].replace(/,/g, ''), 10);
-            }
-        } catch(e) {}
-    }
+  // Portrait: prefer top-track album cover, then artist image, then fallback
+  let portrait = artist.images?.[0]?.url || FALLBACK_IMAGE;
+  if (topTracks?.tracks?.length > 0) {
+    const trackImg = topTracks.tracks[0].album.images?.[0]?.url;
+    if (trackImg) portrait = trackImg;
+  }
+  if (!portrait) portrait = FALLBACK_IMAGE;
 
-    // Stable Portrait Logic
-    let portraitUrl = artist.images?.[0]?.url;
-    // Prefer Top Track Album Cover (ab67616d...)
-    if (topTracks && topTracks.tracks && topTracks.tracks.length > 0) {
-        const trackImg = topTracks.tracks[0].album.images?.[0]?.url;
-        if (trackImg) portraitUrl = trackImg;
-    }
-    
-    // If STILL undefined or empty, use fallback
-    if (!portraitUrl || portraitUrl === '') {
-        portraitUrl = FALLBACK_IMAGE;
-    }
-
-    const bio = await getArtistBio(artist.name);
-
-    return {
-        id: artist.id,
-        name: artist.name,
-        slug: artist.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-        genres: (artist.genres || []).slice(0, 3).map(g => g.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')),
-        followers: followers,
-        popularity: popularity,
-        portrait: portraitUrl,
-        releases: releases.map(r => ({
-            name: r.name,
-            year: r.release_date.split('-')[0],
-            image: r.images?.[0]?.url || FALLBACK_IMAGE,
-            type: r.album_type
-        })),
-        releaseCount: releaseCount,
-        bio: bio
-    };
+  return {
+    id:          artist.id,
+    name:        artist.name,
+    genres:      (artist.genres || []).slice(0, 3).map(g =>
+                   g.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')),
+    followers,
+    popularity,
+    portrait,
+    spotify_url: `https://open.spotify.com/artist/${artist.id}`,
+    releases: releases.map(r => ({
+      name:  r.name,
+      year:  r.release_date.split('-')[0],
+      image: r.images?.[0]?.url || FALLBACK_IMAGE,
+      type:  r.album_type,
+    })),
+    releaseCount: albumsRaw.total || 0,
+  };
 }
 
+
+// ── FORMATTING ───────────────────────────────────────────────
 function formatStat(num) {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+  if (num >= 1_000)     return (num / 1_000).toFixed(1) + 'K';
+  return String(num);
 }
 
 const ARTIST_CARD_TEMPLATE = (artist) => `
@@ -317,7 +258,9 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
               <span style="color:var(--accent)">${artist.name}</span>
             </div>
             <div class="artist-meta-tags">
-              ${artist.genres.length > 0 ? artist.genres.map(g => `<span class="artist-genre-tag">${g}</span>`).join('\n              ') : '<span class="artist-genre-tag">Traverce Choice</span>'}
+              ${artist.genres.length > 0
+                ? artist.genres.map(g => `<span class="artist-genre-tag">${g}</span>`).join('\n              ')
+                : '<span class="artist-genre-tag">Traverce Choice</span>'}
             </div>
             <h1 class="artist-name">${artist.name}</h1>
             <div class="artist-stats">
@@ -353,9 +296,11 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
           <div class="artist-body-grid">
             <div class="artist-bio-col">
               <div class="artist-section-label">About</div>
-              ${artist.bio ? artist.bio.split('\n\n').map(p => `<p class="artist-bio">${p}</p>`).join('\n              ') : `<p class="artist-bio">Biography currently unavailable.</p>`}
+              ${artist.bio
+                ? artist.bio.split('\n\n').map(p => `<p class="artist-bio">${p}</p>`).join('\n              ')
+                : `<p class="artist-bio">Biography currently unavailable.</p>`}
               <div class="artist-social-row">
-                <a href="https://open.spotify.com/artist/${artist.id}" target="_blank" class="social-btn" title="Spotify Profile">
+                <a href="https://open.spotify.com/artist/${artist.spotify_artist_id}" target="_blank" class="social-btn" title="Spotify Profile">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.11 17.587c-.247.407-.78.533-1.187.287-2.614-1.6-5.903-1.96-9.782-1.07-.463.107-.927-.187-1.033-.653-.107-.463.187-.927.653-1.033 4.25-.97 7.893-.563 10.873 1.263.407.246.533.78.287 1.186v.02zm1.36-3.23c-.313.513-.98.673-1.493.36-2.993-1.84-7.553-2.373-11.087-1.293-.58.173-1.187-.147-1.36-.727-.173-.58.147-1.187.727-1.36 4.027-1.22 9.047-.633 12.527 1.507.513.313.673.98.36 1.493v.013zm.127-3.393c-3.587-2.127-9.513-2.327-12.953-1.287-.553.167-1.127-.16-1.293-.713-.167-.553.16-1.127.713-1.293 3.967-1.2 10.513-1 14.613 1.433.493.293.653.94.36 1.433-.293.493-.94.653-1.433.36z"/></svg>
                 </a>
               </div>
@@ -363,7 +308,7 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
 
             <div class="artist-player-col">
               <div class="artist-player">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/${artist.id}?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe style="border-radius:12px" data-src="https://open.spotify.com/embed/artist/${artist.spotify_artist_id}?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -371,10 +316,10 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
           <div class="artist-releases">
             <div class="section-header">
               <h2 class="section-title">Latest <span>Releases</span></h2>
-              <a href="https://open.spotify.com/artist/${artist.id}" target="_blank" class="view-all">Full Discography</a>
+              <a href="https://open.spotify.com/artist/${artist.spotify_artist_id}" target="_blank" class="view-all">Full Discography</a>
             </div>
             <div class="releases-grid">
-              ${artist.releases.map((release, i) => `
+              ${artist.releases.map((release) => `
               <article class="release-card fade-up">
                 <div class="release-img"><img src="${release.image}" alt="${release.name}" loading="lazy"/></div>
                 <div class="release-tag">${release.type.charAt(0).toUpperCase() + release.type.slice(1)} &middot; ${release.year}</div>
@@ -402,66 +347,211 @@ const ARTIST_PAGE_TEMPLATE = (artist) => `
       </article>
     </div>`;
 
+
+// ── WRITE UPDATED artists_db.js ──────────────────────────────
+function writeUpdatedDB(updatedArtists) {
+  const header = `/**
+ * TRAVERCE — ARTISTS DATABASE (artists_db.js)
+ * Auto-updated by sync_artists.js on ${new Date().toISOString()}
+ *
+ * RULES:
+ *  - spotify_artist_id is the PRIMARY KEY. Never change it once set.
+ *  - bio_manual overrides Spotify bio. Edit via Admin Portal or directly here.
+ *  - is_verified: true = synced. false = skipped, needs Admin Portal verification.
+ *  - Fields below "Synced from Spotify" are overwritten on each sync — do not edit.
+ */
+
+export const ARTISTS = `;
+
+  const content = header + JSON.stringify(updatedArtists, null, 2) + ';\n';
+  fs.writeFileSync(DB_FILE, content, 'utf8');
+  console.log(`💾 artists_db.js updated with ${updatedArtists.length} artist records.`);
+}
+
+
+// ── MAIN SYNC ────────────────────────────────────────────────
 async function sync() {
-    console.log('🔄 Starting Automated Artist Sync...');
-    
-    // 1. Use hardcoded ARTIST_IDS (Spotify client_credentials cannot access user playlist tracks)
-    const artistIds = ARTIST_IDS.filter(id => id && id.trim().length === 22);
-    console.log(`📋 Syncing ${artistIds.length} artists from hardcoded list.`);
-    if (artistIds.length === 0) {
-        console.error('❌ ARTIST_IDS list is empty — add Spotify artist IDs to sync_artists.js');
-        process.exit(1);
+  console.log('🔄 Starting Traverce Artist Sync (v2 — ID-based)...');
+
+  // Validate credentials
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    console.error('❌ Missing Spotify credentials. Check your .env file.');
+    process.exit(1);
+  }
+
+  // Separate verified from unverified
+  const verifiedArtists   = ARTISTS.filter(a => a.is_verified && a.spotify_artist_id);
+  const unverifiedArtists = ARTISTS.filter(a => !a.is_verified || !a.spotify_artist_id);
+
+  console.log(`📋 ${verifiedArtists.length} verified artists to sync.`);
+  if (unverifiedArtists.length > 0) {
+    console.log(`⚠️  ${unverifiedArtists.length} artists need verification in Admin Portal:`);
+    unverifiedArtists.forEach(a => console.log(`   → ${a.name} (${a.spotify_artist_id || 'no ID'})`));
+  }
+
+  if (verifiedArtists.length === 0) {
+    console.error('❌ No verified artists found. Add at least one verified artist to artists_db.js.');
+    process.exit(1);
+  }
+
+  const { token } = await getAccessToken();
+  const syncedArtists  = [];
+  const updatedDBArray = [...ARTISTS]; // preserve all records including unverified
+
+  for (const artistRecord of verifiedArtists) {
+    console.log(`📡 Syncing: ${artistRecord.name} (${artistRecord.spotify_artist_id})`);
+    try {
+      const spotifyData = await getSpotifyData(token, artistRecord.spotify_artist_id);
+
+      // Bio priority: bio_manual > Wikipedia/Last.fm scrape
+      const bio = artistRecord.bio_manual && artistRecord.bio_manual.trim()
+        ? artistRecord.bio_manual
+        : await getArtistBio(spotifyData.name);
+
+      const synced = {
+        ...artistRecord,
+        // Update synced fields from Spotify
+        name:         spotifyData.name,      // keep Spotify's canonical name
+        spotify_url:  spotifyData.spotify_url,
+        genres:       spotifyData.genres,
+        followers:    spotifyData.followers,
+        popularity:   spotifyData.popularity,
+        portrait:     spotifyData.portrait,
+        releases:     spotifyData.releases,
+        releaseCount: spotifyData.releaseCount,
+        last_synced_at: new Date().toISOString(),
+        // Preserve editorial fields (never overwrite)
+        bio_manual:   artistRecord.bio_manual,
+        is_verified:  artistRecord.is_verified,
+        bio,
+      };
+
+      if (synced.releaseCount === 0 && synced.followers === 0 && synced.popularity === 0) {
+        console.warn(`⚠️  ${synced.name}: Profile appears blank. Skipping to avoid overwriting.`);
+        continue;
+      }
+
+      syncedArtists.push(synced);
+
+      // Update this artist's record in the full DB array
+      const idx = updatedDBArray.findIndex(a => a.spotify_artist_id === artistRecord.spotify_artist_id);
+      if (idx !== -1) updatedDBArray[idx] = synced;
+
+    } catch (e) {
+      console.warn(`⚠️  Skip ${artistRecord.name}: ${e.message}`);
     }
 
-    // 2. Get Data
-    const token = await getAccessToken();
-    const artists = [];
+    // Rate limit pause
+    await new Promise(r => setTimeout(r, 500));
+  }
 
-    for (const id of artistIds) {
-        console.log(`📡 Syncing metadata for: ${id}`);
-        try {
-            const data = await getArtistData(token, id);
-            if (data.releaseCount === 0 && data.followers === 0 && data.popularity === 0) {
-                console.warn(`⚠️ Skip artist ${data.name || id}: Profile is completely blank (no data).`);
-            } else {
-                artists.push(data);
-            }
-        } catch (e) {
-            console.warn(`⚠️ Skip artist ${id}:`, e.message);
+  if (syncedArtists.length === 0) {
+    console.error('❌ Failed to sync any artists. Aborting to protect existing site data.');
+    process.exit(1);
+  }
+
+  // Sort: by popularity desc, then name asc
+  syncedArtists.sort((a, b) => b.popularity - a.popularity || a.name.localeCompare(b.name));
+
+  // ── Update index.html ──────────────────────────────────────
+  let html = fs.readFileSync(HTML_FILE, 'utf8');
+
+  const gridHtml  = syncedArtists.map(a => ARTIST_CARD_TEMPLATE(a)).join('\n');
+  const pagesHtml = syncedArtists.map(a => ARTIST_PAGE_TEMPLATE(a)).join('\n');
+
+  html = html.replace(
+    /(<!-- ARTIST_GRID_START -->)[\s\S]*?(<!-- ARTIST_GRID_END -->)/,
+    `$1\n        ${gridHtml.trim()}\n        $2`
+  );
+  html = html.replace(
+    /(<!-- ARTIST_PAGES_START -->)[\s\S]*?(<!-- ARTIST_PAGES_END -->)/,
+    `$1\n    ${pagesHtml.trim()}\n    $2`
+  );
+  fs.writeFileSync(HTML_FILE, html);
+
+  // ── Update main.js ─────────────────────────────────────────
+  let js = fs.readFileSync(JS_FILE, 'utf8');
+
+  const slugList   = syncedArtists.map(a => `'${a.slug}'`).join(', ');
+  const toggleList = syncedArtists.map(a => `    ['${a.slug}Toggle', '${a.slug}Body'],`).join('\n');
+
+  js = js.replace(
+    /(\/\* ARTIST_TABS_START \*\/)[\s\S]*?(\/\* ARTIST_TABS_END \*\/)/,
+    `$1\n      ${slugList},\n      $2`
+  );
+  js = js.replace(
+    /(\/\* ARTIST_TOGGLES_START \*\/)[\s\S]*?(\/\* ARTIST_TOGGLES_END \*\/)/,
+    `$1\n${toggleList}\n    $2`
+  );
+  fs.writeFileSync(JS_FILE, js);
+
+  // ── Write updated artists_db.js ────────────────────────────
+  writeUpdatedDB(updatedDBArray);
+
+  // ── Push synced data to Cloudflare D1 ─────────────────────
+  await pushToD1(updatedDBArray);
+
+  console.log(`\n✨ Sync complete! ${syncedArtists.length} artists synced.`);
+  if (unverifiedArtists.length > 0) {
+    console.log(`ℹ️  Visit ${TRAVERCE_API_URL ? TRAVERCE_API_URL : 'http://localhost:8788'}/admin.html to verify ${unverifiedArtists.length} pending artists.`);
+  }
+}
+
+// ── PUSH TO D1 ───────────────────────────────────────────────
+async function pushToD1(artists) {
+  if (!TRAVERCE_API_URL || !TRAVERCE_ADMIN_KEY) {
+    console.log('ℹ️  Skipping D1 push (TRAVERCE_API_URL or TRAVERCE_ADMIN_KEY not set).');
+    return;
+  }
+
+  console.log(`\n☁️  Pushing ${artists.length} artists to Cloudflare D1...`);
+  let pushed = 0; let failed = 0;
+
+  for (const artist of artists) {
+    try {
+      // Try PUT first (update existing), fall back to POST (create new)
+      const putRes = await fetch(
+        `${TRAVERCE_API_URL}/api/artists?spotify_id=${encodeURIComponent(artist.spotify_artist_id || '')}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': TRAVERCE_ADMIN_KEY },
+          body: JSON.stringify({
+            ...artist,
+            release_count: artist.releaseCount || artist.release_count || 0,
+          }),
         }
-        // Delay to respect API rate limits
-        await new Promise(resolve => setTimeout(resolve, 500));
+      );
+
+      if (putRes.ok || putRes.status === 404) {
+        if (putRes.status === 404 || !(await putRes.json().catch(() => ({ success: false }))).success) {
+          // Artist doesn't exist yet — create it
+          await fetch(`${TRAVERCE_API_URL}/api/artists`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': TRAVERCE_ADMIN_KEY },
+            body: JSON.stringify({
+              ...artist,
+              release_count: artist.releaseCount || artist.release_count || 0,
+            }),
+          });
+        }
+        pushed++;
+      } else {
+        failed++;
+        console.warn(`   ⚠️  D1 push failed for ${artist.name}: ${putRes.status}`);
+      }
+    } catch (e) {
+      failed++;
+      console.warn(`   ⚠️  D1 push error for ${artist.name}: ${e.message}`);
     }
 
-    if (artists.length === 0) {
-        console.error('❌ Failed to fetch data for any artists. Aborting sync to prevent wiping out the site.');
-        process.exit(1);
-    }
+    // Small pause to avoid rate-limiting the Pages Function
+    await new Promise(r => setTimeout(r, 100));
+  }
 
-    // 3. Sort
-    artists.sort((a, b) => b.popularity - a.popularity || a.name.localeCompare(b.name));
-
-    // 4. Update Files
-    let html = fs.readFileSync(HTML_FILE, 'utf8');
-    const gridHtml = artists.map(a => ARTIST_CARD_TEMPLATE(a)).join('\n');
-    const pagesHtml = artists.map(a => ARTIST_PAGE_TEMPLATE(a)).join('\n');
-
-    html = html.replace(/(<!-- ARTIST_GRID_START -->)[\s\S]*?(<!-- ARTIST_GRID_END -->)/, `$1\n        ${gridHtml.trim()}\n        $2`);
-    html = html.replace(/(<!-- ARTIST_PAGES_START -->)[\s\S]*?(<!-- ARTIST_PAGES_END -->)/, `$1\n    ${pagesHtml.trim()}\n    $2`);
-    fs.writeFileSync(HTML_FILE, html);
-
-    let js = fs.readFileSync(JS_FILE, 'utf8');
-    const slugList = artists.map(a => `'${a.slug}'`).join(', ');
-    const toggleList = artists.map(a => `    ['${a.slug}Toggle', '${a.slug}Body'],`).join('\n');
-
-    js = js.replace(/(\/\* ARTIST_TABS_START \*\/)[\s\S]*?(\/\* ARTIST_TABS_END \*\/)/, `$1\n      ${slugList},\n      $2`);
-    js = js.replace(/(\/\* ARTIST_TOGGLES_START \*\/)[\s\S]*?(\/\* ARTIST_TOGGLES_END \*\/)/, `$1\n${toggleList}\n    $2`);
-    fs.writeFileSync(JS_FILE, js);
-
-    console.log(`\n✨ Sync Complete! ${artists.length} artists updated.`);
+  console.log(`☁️  D1 push done: ${pushed} pushed, ${failed} failed.`);
 }
 
 sync().catch(err => {
-    console.error('❌ Automation failed:', err);
-    process.exit(1);
+  console.error('❌ Sync failed:', err);
+  process.exit(1);
 });

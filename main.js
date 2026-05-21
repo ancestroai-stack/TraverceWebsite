@@ -607,7 +607,7 @@ import * as htmlToImage from 'html-to-image';
     const hash = window.location.hash.replace('#', '');
     return ['home', 'artist', 
       /* ARTIST_TABS_START */
-      'lila-ik-', 'magixx', 'mahalia', 'teni', 'yo-maps', 'chef-187', 'frank-ro', 'xaven', 'kb', 'triple-m', 'jc-kalinks', 'tio-nason', 'chewe', 'esii', 'mag44', 'mordecaii', 'rustar', 'the-f-a-k-e', 'f-jay', 'kanina-kandalama', 'styve-ace', 'bad-boy-shezy', 'iamwaters', 'nyarai', 'vleko', 'zaggar',
+      'lila-ik-', 'magixx', 'mahalia', 'teni', 'yo-maps', 'frank-ro', 'chef-187', 'xaven', 'kb', 'triple-m', 'jc-kalinks', 'tio-nason', 'chewe', 'mordecaii', 'esii', 'mag44', 'rustar', 'f-jay', 'the-f-a-k-e', 'kanina-kandalama', 'styve-ace', 'bad-boy-shezy', 'iamwaters', 'vleko', 'zaggar',
       /* ARTIST_TABS_END */
       'hub', 'shop', 'about'].includes(hash) ? hash : 'home';
   }
@@ -742,25 +742,24 @@ import * as htmlToImage from 'html-to-image';
     ['mahaliaToggle', 'mahaliaBody'],
     ['teniToggle', 'teniBody'],
     ['yo-mapsToggle', 'yo-mapsBody'],
-    ['chef-187Toggle', 'chef-187Body'],
     ['frank-roToggle', 'frank-roBody'],
+    ['chef-187Toggle', 'chef-187Body'],
     ['xavenToggle', 'xavenBody'],
     ['kbToggle', 'kbBody'],
     ['triple-mToggle', 'triple-mBody'],
     ['jc-kalinksToggle', 'jc-kalinksBody'],
     ['tio-nasonToggle', 'tio-nasonBody'],
     ['cheweToggle', 'cheweBody'],
+    ['mordecaiiToggle', 'mordecaiiBody'],
     ['esiiToggle', 'esiiBody'],
     ['mag44Toggle', 'mag44Body'],
-    ['mordecaiiToggle', 'mordecaiiBody'],
     ['rustarToggle', 'rustarBody'],
-    ['the-f-a-k-eToggle', 'the-f-a-k-eBody'],
     ['f-jayToggle', 'f-jayBody'],
+    ['the-f-a-k-eToggle', 'the-f-a-k-eBody'],
     ['kanina-kandalamaToggle', 'kanina-kandalamaBody'],
     ['styve-aceToggle', 'styve-aceBody'],
     ['bad-boy-shezyToggle', 'bad-boy-shezyBody'],
     ['iamwatersToggle', 'iamwatersBody'],
-    ['nyaraiToggle', 'nyaraiBody'],
     ['vlekoToggle', 'vlekoBody'],
     ['zaggarToggle', 'zaggarBody'],
     /* ARTIST_TOGGLES_END */
