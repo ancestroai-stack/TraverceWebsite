@@ -1,0 +1,450 @@
+/**
+ * TRAVERCE — Backstage Access JS
+ * Encapsulates styles, markup, and authorization flow.
+ */
+
+// ── DYNAMIC STYLE INJECTION ────────────────────────────────
+const styles = `
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #080808;
+    --accent:  #FFD042;
+    --accent2: #ff6b35;
+    --white:   #ffffff;
+    --muted:   #555;
+    --border:  rgba(255,255,255,0.07);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── ANIMATED BACKGROUND ──────────────────────────────── */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0;
+    overflow: hidden;
+  }
+
+  /* Frequency bars */
+  .freq-bars {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    height: 45vh;
+    padding: 0 2rem;
+    opacity: 0.06;
+  }
+  .freq-bar {
+    flex: 1;
+    max-width: 8px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+    animation: barPulse var(--dur) ease-in-out infinite alternate;
+    transform-origin: bottom;
+  }
+  @keyframes barPulse {
+    from { height: 8%; }
+    to   { height: var(--h); }
+  }
+
+  /* Gradient orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: orbFloat var(--od) ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 400px; height: 400px; background: var(--accent);  top: -100px; left: -100px; --od: 8s; }
+  .orb-2 { width: 300px; height: 300px; background: var(--accent2); bottom: -80px; right: -80px; --od: 11s; }
+  .orb-3 { width: 200px; height: 200px; background: #9333ea;        top: 40%; left: 60%; --od: 14s; }
+  @keyframes orbFloat {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(30px, -30px) scale(1.1); }
+  }
+
+  /* Scanline */
+  .scanline {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* ── MAIN LAYOUT ──────────────────────────────────────── */
+  .page {
+    position: relative; z-index: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  /* ── LOGO MARK ────────────────────────────────────────── */
+  .logo-wrap {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .logo-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 0 40px rgba(255,208,66,0.3);
+    animation: iconGlow 3s ease-in-out infinite alternate;
+  }
+  @keyframes iconGlow {
+    from { box-shadow: 0 0 30px rgba(255,208,66,0.25); }
+    to   { box-shadow: 0 0 60px rgba(255,208,66,0.5);  }
+  }
+  .logo-icon svg { width: 28px; height: 28px; }
+
+  .logo-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2.2rem; font-weight: 900;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    line-height: 1;
+  }
+  .logo-name span { color: var(--accent); }
+
+  .logo-tag {
+    font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--muted); margin-top: 0.4rem;
+  }
+
+  /* ── CARD ─────────────────────────────────────────────── */
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem 2.5rem 2rem;
+    width: 100%; max-width: 380px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6),
+                0 0 0 1px rgba(255,255,255,0.04) inset;
+  }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--white); margin-bottom: 0.3rem;
+  }
+  .card-sub {
+    font-size: 0.78rem; color: var(--muted); margin-bottom: 2rem;
+  }
+
+  /* ── FORM ─────────────────────────────────────────────── */
+  .form-label {
+    display: block;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: #777; margin-bottom: 0.5rem;
+  }
+
+  .input-wrap {
+    position: relative; margin-bottom: 1.25rem;
+  }
+  .input-wrap svg {
+    position: absolute; left: 0.9rem; top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.35; pointer-events: none;
+  }
+  .form-input {
+    width: 100%; padding: 0.85rem 0.9rem 0.85rem 2.6rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 7px;
+    color: var(--white); font-family: 'Inter', sans-serif;
+    font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.08em;
+  }
+  .form-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,208,66,0.1);
+  }
+  .form-input::placeholder { color: #444; letter-spacing: 0.04em; }
+
+  .toggle-pw {
+    position: absolute; right: 0.85rem; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #555; padding: 0.2rem;
+    transition: color 0.15s;
+  }
+  .toggle-pw:hover { color: var(--accent); }
+
+  /* ── SUBMIT BTN ───────────────────────────────────────── */
+  .submit-btn {
+    width: 100%; padding: 0.9rem 1.5rem;
+    background: var(--accent);
+    border: none; border-radius: 7px;
+    color: #000; font-family: 'Inter', sans-serif;
+    font-size: 0.88rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .submit-btn:hover { opacity: 0.9; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Shimmer effect on hover */
+  .submit-btn::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s;
+  }
+  .submit-btn:hover::before { left: 150%; }
+
+  /* ── ERROR / STATUS ───────────────────────────────────── */
+  .status-msg {
+    margin-top: 1rem; padding: 0.65rem 1rem;
+    border-radius: 5px; font-size: 0.8rem;
+    display: none;
+  }
+  .status-msg.error { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+  .status-msg.success { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+
+  /* ── FOOTER ───────────────────────────────────────────── */
+  .card-footer {
+    margin-top: 1.5rem; text-align: center;
+    font-size: 0.7rem; color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── LOADING SPINNER ──────────────────────────────────── */
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 0.4rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── SHAKE ANIMATION ──────────────────────────────────── */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-6px); }
+    40%,80% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+`;
+
+const styleEl = document.createElement('style');
+styleEl.textContent = styles;
+document.head.appendChild(styleEl);
+
+// ── DYNAMIC HTML RENDERING ─────────────────────────────────
+const markup = `
+  <!-- ANIMATED BACKGROUND -->
+  <div class="bg-canvas">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="freq-bars" id="freqBars"></div>
+    <div class="scanline"></div>
+  </div>
+
+  <!-- PAGE -->
+  <div class="page">
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <div class="logo-name">Trav<span>erce</span></div>
+      <div class="logo-tag">Backstage Access</div>
+    </div>
+
+    <div class="card" id="loginCard">
+      <div class="card-title">Backstage</div>
+      <div class="card-sub">Restricted area. Enter your access code to continue.</div>
+
+      <label class="form-label" for="passwordInput">Access Code</label>
+      <div class="input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <input
+          type="password"
+          id="passwordInput"
+          class="form-input"
+          placeholder="••••••••••••"
+          autocomplete="current-password"
+          autofocus
+        />
+        <button class="toggle-pw" type="button" id="togglePw" title="Show/hide password">
+          <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+
+      <button class="submit-btn" id="loginBtn" type="button">
+        Enter Backstage
+      </button>
+
+      <div class="status-msg" id="statusMsg"></div>
+
+      <div class="card-footer">
+        Traverce Admin Portal &nbsp;·&nbsp; Authorised Personnel Only
+      </div>
+    </div>
+  </div>
+`;
+
+const appEl = document.getElementById('backstage-app');
+if (appEl) {
+  appEl.innerHTML = markup;
+}
+
+// ── FREQUENCY BARS GENERATION ──────────────────────────────
+const barsContainer = document.getElementById('freqBars');
+if (barsContainer) {
+  const numBars = 80;
+  for (let i = 0; i < numBars; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'freq-bar';
+    const height = Math.floor(Math.random() * 80) + 20;
+    const dur    = (Math.random() * 1.5 + 0.6).toFixed(2);
+    bar.style.setProperty('--h', height + '%');
+    bar.style.setProperty('--dur', dur + 's');
+    bar.style.animationDelay = (Math.random() * 1.5).toFixed(2) + 's';
+    barsContainer.appendChild(bar);
+  }
+}
+
+// ── AUTH FLOW ─────────────────────────────────────────────
+const API_BASE = window.location.origin;
+
+const passwordInput = document.getElementById('passwordInput');
+const loginBtn      = document.getElementById('loginBtn');
+const statusMsg     = document.getElementById('statusMsg');
+const togglePw      = document.getElementById('togglePw');
+const eyeIcon       = document.getElementById('eyeIcon');
+
+// If already logged in, redirect directly
+const existingToken = sessionStorage.getItem('traverce_session');
+if (existingToken) {
+  verifyAndRedirect(existingToken);
+}
+
+if (togglePw && passwordInput && eyeIcon) {
+  // Toggle password visibility
+  togglePw.addEventListener('click', () => {
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    eyeIcon.innerHTML = isPassword
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  });
+}
+
+if (passwordInput && loginBtn) {
+  // Enter key submits
+  passwordInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') loginBtn.click();
+  });
+}
+
+if (loginBtn) {
+  // Login button
+  loginBtn.addEventListener('click', async () => {
+    const password = passwordInput.value.trim();
+    if (!password) {
+      showStatus('Enter your access code.', 'error');
+      return;
+    }
+
+    setLoading(true);
+    hideStatus();
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ password }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        sessionStorage.setItem('traverce_session', data.token);
+        showStatus('Access granted. Loading…', 'success');
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 600);
+      } else {
+        showStatus(data.error || 'Access denied.', 'error');
+        passwordInput.value = '';
+        passwordInput.classList.add('shake');
+        setTimeout(() => passwordInput.classList.remove('shake'), 400);
+        passwordInput.focus();
+      }
+    } catch (e) {
+      showStatus('Connection error. Check your network.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  });
+}
+
+async function verifyAndRedirect(token) {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth`, {
+      headers: { 'X-Admin-Key': token },
+    });
+    if (res.ok) {
+      window.location.href = '/admin';
+    } else {
+      sessionStorage.removeItem('traverce_session');
+    }
+  } catch { /* stay on login page */ }
+}
+
+function setLoading(on) {
+  if (!loginBtn) return;
+  loginBtn.disabled = on;
+  loginBtn.innerHTML = on
+    ? '<span class="spinner"></span> Verifying…'
+    : 'Enter Backstage';
+}
+function showStatus(msg, type) {
+  if (!statusMsg) return;
+  statusMsg.textContent = msg;
+  statusMsg.className   = `status-msg ${type}`;
+  statusMsg.style.display = 'block';
+}
+function hideStatus() {
+  if (!statusMsg) return;
+  statusMsg.style.display = 'none';
+}
