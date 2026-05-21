@@ -137,8 +137,9 @@ async function handlePut(request, env) {
   const url = new URL(request.url);
   const id  = url.searchParams.get('id');
   const spotifyId = url.searchParams.get('spotify_id');
+  const slug = url.searchParams.get('slug');
 
-  if (!id && !spotifyId) return err('id or spotify_id query param required');
+  if (!id && !spotifyId && !slug) return err('id, spotify_id, or slug query param required');
 
   const body = await request.json().catch(() => null);
   if (!body) return err('Invalid JSON body');
@@ -162,8 +163,17 @@ async function handlePut(request, env) {
   fields.push('updated_at = ?');
   values.push(new Date().toISOString());
 
-  const whereClause = id ? `id = ?` : `spotify_artist_id = ?`;
-  values.push(id || spotifyId);
+  let whereClause = '';
+  if (id) {
+    whereClause = 'id = ?';
+    values.push(id);
+  } else if (spotifyId) {
+    whereClause = 'spotify_artist_id = ?';
+    values.push(spotifyId);
+  } else {
+    whereClause = 'slug = ?';
+    values.push(slug);
+  }
 
   const result = await env.DB.prepare(
     `UPDATE artists SET ${fields.join(', ')} WHERE ${whereClause}`

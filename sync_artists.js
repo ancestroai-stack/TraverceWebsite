@@ -511,7 +511,7 @@ async function pushToD1(artists) {
     try {
       // Try PUT first (update existing), fall back to POST (create new)
       const putRes = await fetch(
-        `${TRAVERCE_API_URL}/api/artists?spotify_id=${encodeURIComponent(artist.spotify_artist_id || '')}`,
+        `${TRAVERCE_API_URL}/api/artists?slug=${encodeURIComponent(artist.slug)}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'X-Admin-Key': TRAVERCE_ADMIN_KEY },
